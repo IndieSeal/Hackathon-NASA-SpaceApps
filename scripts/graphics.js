@@ -1,19 +1,19 @@
-const project_title = "Astrosalud";
+import { APP_NAME } from "./variables.js"
 
 function setPageName(){
     var elements = document.querySelectorAll (".project-name");
     elements.forEach(element => {
-        element.innerHTML = project_title;
+        element.innerHTML = APP_NAME;
     });
-    document.title = project_title;
+    document.title = APP_NAME;
 }
 setPageName();
 
-// Referencia al canvas
 const $grafica = document.querySelector("#grafica");
-// Etiquetas para el eje X
+
+// Eje X
 const etiquetas = ["Enero", "Febrero", "Marzo", "Abril"];
-// Datos del gráfico
+
 const datosVentas2020 = {
    label: "Ventas por mes",
    data: [5000, 1500, 8000, 5102],
@@ -21,7 +21,7 @@ const datosVentas2020 = {
    borderColor: 'rgba(54, 162, 235, 1)',
    borderWidth: 1,
 };
-// Crear el gráfico
+
 new Chart($grafica, {
    type: 'line',
    data: {
