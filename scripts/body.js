@@ -19,12 +19,12 @@ const SYS = {
   lungs: {name: "Pulmones", sub: "Respiración y oxígeno", hits: [[430, 355, 52], [552, 345, 50]], re: /HIPOXIA|DESATURACION|TAQUIPNEA|BRADIPNEA/,
     spark: "spo2", cap: "Saturación de oxígeno, últimos registros",
     big: t => [f(t.spo2, 1), "% SpO2"],
-    rows: t => [["Frecuencia respiratoria", f(t.resp_rate) + " rpm"]]},
+    rows: (t, m) => [["Frecuencia respiratoria", f(t.resp_rate) + " rpm"], ["Tendencia de SpO2", f(m.spo2_slope, 1) + " %/min"]]},
   heart: {name: "Corazón", sub: "Ritmo cardíaco", hits: [[512, 405, 42]], re: /ARRITMIA|TAQUICARDIA|BRADICARDIA|VARIABILIDAD|CHOQUE/, pred: "EVENTO_CARDIOVASCULAR",
     ecg: true, cap: "Latido simulado con la frecuencia actual",
     big: t => [f(t.hr), "lpm"],
-    rows: (t, m) => [["Variabilidad (RMSSD)", f(t.hrv_rmssd, 1) + " ms"], ["Índice de choque", f(m.shock_index, 2)]]},
-  vessels: {name: "Circulación", sub: "Presión arterial", hits: [[652, 400, 50], [328, 400, 50], [490, 720, 70]], re: /HIPOTENSION|HIPERTENSION|PULSO/,
+    rows: (t, m) => [["Variabilidad (RMSSD)", f(t.hrv_rmssd, 1) + " ms"], ["Índice de choque", f(m.shock_index, 2)], ["Tendencia de FC", f(m.hr_slope, 1) + " lpm/min"]]},
+  vessels: {name: "Circulación", sub: "Presión arterial", hits: [[652, 400, 50], [328, 400, 50], [490, 720, 70]], re: /HIPOTENSION|HIPERTENS|PULSO/,
     spark: "sbp", cap: "Presión sistólica, últimos registros",
     big: t => [f(t.sbp) + "/" + f(t.dbp), "mmHg"],
     rows: (t, m) => [["Presión de pulso", f(m.pulse_pressure ?? t.sbp - t.dbp) + " mmHg"]]},
@@ -41,6 +41,7 @@ function status(k) {
   if (!D) return ["ok", []];
   const s = SYS[k], hit = (D.clinical_triggers || []).filter(t => s.re.test(t));
   if (hit.some(t => CRIT.test(t))) return ["crit", hit];
+  if (k === "heart" && D.primary_prediction === "EVENTO_CARDIOVASCULAR" && D.confidence_pct >= 50) return ["crit", hit];
   return [hit.length || D.primary_prediction === s.pred ? "warn" : "ok", hit];
 }
 function paint(k) {

@@ -1,6 +1,8 @@
 (function(){
 "use strict";
-const API = (new URLSearchParams(location.search).get("api") || "").replace(/\/$/, "");
+const sameOriginAsApi = location.port === "8000" || location.port === "";
+const defaultApi = sameOriginAsApi ? "" : `${location.protocol}//${location.hostname}:8000`;
+const API = (new URLSearchParams(location.search).get("api") || defaultApi).replace(/\/$/, "");
 const WS_URL = API ? API.replace(/^http/, "ws") + "/ws/telemetry"
                    : (location.protocol === "https:" ? "wss:" : "ws:") + "//" + location.host + "/ws/telemetry";
 const MAX = 25;
@@ -23,6 +25,7 @@ const BY_CARD = {
   shock:["INDICE_DE_CHOQUE_CRITICO","INDICE_DE_CHOQUE_ELEVADO"],
   pulse:["PRESION_DE_PULSO_ESTRECHA","PRESION_DE_PULSO_AMPLIA"]
 };
+const ENV = {STATION:"Estación", SPACECRAFT:"Nave", ROVER:"Rover", LUNAR_BASE:"Base lunar"};
 const pretty = t => { const s = t.toLowerCase().replace(/_/g, " "); return s.charAt(0).toUpperCase() + s.slice(1); };
 const clock = ts => new Date(ts * 1000).toLocaleTimeString("es-MX", {hour12:false});
 
@@ -70,7 +73,7 @@ function render(d, pushPoint){
   $("level").textContent = LEVEL[c] || c;
   $("pred").textContent = pretty(d.primary_prediction);
   $("conf").textContent = d.confidence_pct.toFixed(1) + "%";
-  $("anom").textContent = "Astronauta " + d.astronaut_id + (d.unsupervised_anomaly ? " · anomalía detectada" : " · sin anomalías");
+  $("anom").textContent = "Astronauta " + d.astronaut_id + " · " + (ENV[tel.environment] || tel.environment || "sin entorno") + (d.unsupervised_anomaly ? " · anomalía detectada" : " · sin anomalías");
   $("chips").innerHTML = "";
   (trg.length ? trg : [null]).forEach(t => {
     const s = document.createElement("span");
@@ -185,7 +188,33 @@ function socket(){
   ws.onerror = () => ws.close();
 }
 
-history(true); health(); socket();
+/* Escenario elegido y disparo unico (POST /simulate/{escenario}) */
+let current = null;
+document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => { current = b.dataset.s; $("shot").disabled = false; }));
+$("shot").addEventListener("click", async () => {
+  if (!current) return;
+  $("shot").disabled = true;
+  try { await post("/simulate/" + current); } catch(e){ console.error(e); }
+  $("shot").disabled = false;
+});
+
+/* Persistencia en Postgres (GET /persistence/status, POST /persistence/start|stop) */
+let persistOn = false;
+function persistUI(s){
+  persistOn = !!s.enabled;
+  $("persist").setAttribute("aria-pressed", persistOn);
+  $("persist").textContent = "Guardado en BD: " + (persistOn ? "activo" : "apagado");
+  $("persistInfo").textContent = s.last_error ? "No se pudo conectar a la base de datos" : persistOn ? s.saved_count + " lecturas guardadas" : "";
+  $("persistInfo").title = s.last_error || "";
+}
+async function persistStatus(){ try { persistUI(await (await fetch(API + "/persistence/status")).json()); } catch(e){} }
+$("persist").addEventListener("click", async () => {
+  try { persistUI(await (await post(persistOn ? "/persistence/stop" : "/persistence/start")).json()); }
+  catch(e){ $("persistInfo").textContent = "Sin respuesta del servidor"; }
+});
+
+history(true); health(); socket(); persistStatus();
+setInterval(persistStatus, 5000);
 setInterval(() => { if (!wsOn) history(false); }, 2000);
 setInterval(health, 10000);
 })();
