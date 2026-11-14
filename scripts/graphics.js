@@ -11,6 +11,9 @@ reveal.addEventListener('mousemove', (e) => {
   topImage.style.setProperty('--y', `${y}px`);
 });
 
+    //right: 320px;
+    //bottom: 870px;
+
 reveal.addEventListener('mouseleave', () => {
   topImage.style.setProperty('--x', '-200px');
   topImage.style.setProperty('--y', '-200px');
