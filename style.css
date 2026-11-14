@@ -16,61 +16,6 @@
     box-sizing:border-box;
 }
 
-.image-reveal {
-  position: relative;
-  width: 100%;
-  max-width: 200px;
-  aspect-ratio: 9 / 16;
-  overflow: hidden;
-  cursor: zoom-in;
-}
-
-.image-reveal img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.image-reveal .heart {
-  position: absolute;
-
-    background-color: red;
-    
-    right: 40%;
-    top: 25%;
-
-    width: 10%;
-    height: 5%;
-
-    transition: 0.2s;
-}
-
-.image-reveal .heart:hover {
-    transform: scale(1.2);
-}
-
-.image-reveal .top {
-  --x: 50%;
-  --y: 50%;
-  --radius: 50px;
-
-  mask-image: radial-gradient(
-    circle var(--radius) at var(--x) var(--y),
-    transparent 0,
-    transparent 95%,
-    black 100%
-  );
-
-  -webkit-mask-image: radial-gradient(
-    circle var(--radius) at var(--x) var(--y),
-    transparent 0,
-    transparent 95%,
-    black 100%
-  );
-}
-
 body{
     margin:0;
     background:var(--page);
@@ -156,3 +101,49 @@ header p{margin:2px 0 0;color:var(--muted)}
   .level{font-size:36px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Layout: cuerpo fijo a la izquierda, informacion con scroll a la derecha */
+body{overflow:hidden}
+.app{display:grid;grid-template-columns:minmax(300px,30vw) 1fr;height:100vh}
+.body-panel{background:#fff;border-right:1px solid var(--line);padding:20px 16px 14px;display:flex;flex-direction:column;min-height:0}
+.body-panel svg{flex:1;min-height:0;width:100%;cursor:crosshair;touch-action:pan-y}
+.hint{margin:8px 0 0;text-align:center;color:var(--muted);font-size:12.5px}
+.main{overflow-y:auto;min-width:0}
+
+/* Organos: solo se ven dentro de la lente */
+.organ{opacity:.9;transition:opacity .15s}
+.organ.on{opacity:1}
+.organ.on .s{stroke-width:4}
+.organ.warn .s{stroke:var(--amarillo)}
+.organ.crit .s{stroke:var(--rojo)}
+.organ.heart .s{transform-box:fill-box;transform-origin:center;animation:beat var(--beat,1s) ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}12%{transform:scale(1.09)}24%{transform:scale(1)}36%{transform:scale(1.05)}}
+
+/* Panel flotante junto al cursor */
+.tip{position:fixed;left:0;top:0;width:264px;padding:14px 16px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 36px rgba(20,23,31,.14);pointer-events:none;opacity:0;transition:opacity .12s;z-index:20}
+.tip.show{opacity:1}
+.th{display:flex;justify-content:space-between;gap:8px}
+.th b{display:block;font-weight:600;font-size:15px}
+.th span{color:var(--muted);font-size:12.5px}
+.st{font-style:normal;font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid var(--line);height:fit-content;white-space:nowrap}
+.st.ok{color:var(--verde);border-color:#bfe5d1}
+.st.warn{border-color:var(--amarillo);color:#9a6c00}
+.st.crit{border-color:var(--rojo);color:var(--rojo)}
+.big{margin:10px 0 4px;display:flex;align-items:baseline;gap:6px}
+.big b{font-size:34px;font-weight:600;letter-spacing:-.02em;line-height:1}
+.big span{color:var(--muted)}
+.pulse{width:10px;height:10px;border-radius:50%;background:var(--rojo);align-self:center;animation:beat 1s ease-in-out infinite}
+.tip canvas{width:100%;height:56px;display:block}
+.cap{color:var(--muted);font-size:12px;margin:4px 0 10px}
+.tip dl{margin:0;display:grid;gap:4px}
+.tip dl div{display:flex;justify-content:space-between;font-size:13px}
+.tip dt{color:var(--muted)}
+.tip dd{margin:0;font-weight:500}
+.found{margin-top:10px;font-size:12.5px;color:#9a6c00}
+
+@media (max-width:960px){
+  body{overflow:auto}
+  .app{display:block;height:auto}
+  .body-panel{height:min(72vh,560px);border-right:0;border-bottom:1px solid var(--line)}
+  .main{overflow:visible}
+}

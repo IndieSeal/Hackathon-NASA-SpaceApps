@@ -1,24 +1,3 @@
-const reveal = document.getElementById('reveal');
-const topImage = reveal.querySelector('.top');
-
-reveal.addEventListener('mousemove', (e) => {
-  const rect = reveal.getBoundingClientRect();
-
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-
-  topImage.style.setProperty('--x', `${x}px`);
-  topImage.style.setProperty('--y', `${y}px`);
-});
-
-    //right: 320px;
-    //bottom: 870px;
-
-reveal.addEventListener('mouseleave', () => {
-  topImage.style.setProperty('--x', '-200px');
-  topImage.style.setProperty('--y', '-200px');
-});
-
 (function(){
 "use strict";
 const API = (new URLSearchParams(location.search).get("api") || "").replace(/\/$/, "");
@@ -123,6 +102,7 @@ function render(d, pushPoint){
   c3.data.datasets[0].backgroundColor = CLASSES.map(([k]) => k === d.primary_prediction ? (COLORS[c] || "#14171f") : "#e5e7eb");
   c3.update("none");
   lastTs = tel.timestamp;
+  window.dispatchEvent(new CustomEvent("telemetry", {detail: d}));
 }
 
 function onTelemetry(d){
