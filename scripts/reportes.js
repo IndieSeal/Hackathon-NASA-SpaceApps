@@ -8,6 +8,21 @@ const $ = id => document.getElementById(id);
 const emptyEl = $("empty"), tableEl = $("table"), tbody = $("tbody");
 const modalOverlay = $("modalOverlay"), modalFrame = $("modalFrame"), modalTitle = $("modalTitle");
 
+const regresar = $("regresarReportes");
+regresar.onclick = returnToIndividual;
+
+function returnToIndividual(){
+  const extra = window.location.search;
+  if(extra){
+    //return to solo
+    window.location.href = `/index.html${extra}`;
+  }
+  else{
+    //return to multi
+    window.location.href = `/multi.html`;
+  }
+}
+
 function openPreview(pdfUrl, label) {
   modalTitle.textContent = label;
   modalFrame.src = pdfUrl;
