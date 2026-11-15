@@ -50,7 +50,10 @@ function build(id) {
     sdesc: q(".state span")
   };
 
-  el.querySelectorAll(".arr").forEach(b => b.addEventListener("click", () => {
+  el.querySelectorAll(".arr").forEach(b => b.addEventListener("click", (e) => {
+    e = e || window.event;
+    e.preventDefault();
+
     c.i = (c.i + Number(b.dataset.d) + T.metrics.length) % T.metrics.length; paint(id);
   }));
 
@@ -81,8 +84,6 @@ function paint(id) {
   c.sname.textContent = name;
   c.sdesc.textContent = pretty(T.prediction(id));
   
-  //Set status to selected option from each of the astronauts
-
   spark(c.cv, m.series, m.status);
 }
 
