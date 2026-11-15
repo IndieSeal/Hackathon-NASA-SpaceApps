@@ -56,8 +56,7 @@ function build(id) {
 }
 
 function onAstronautClicked(id){
-  console.log(id);
-  window.location.href = '/index.html';
+  window.location.href = `/index.html?${id}`;
 }
 
 function paint(id) {
