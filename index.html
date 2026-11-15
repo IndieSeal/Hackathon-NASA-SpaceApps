@@ -49,7 +49,11 @@
             <div class="wrap">
                 <header>
                     <div>
-                        <select class="ghost astro-select" id="astroSelect" aria-label="Elegir astronauta"></select>
+                        <div style="width: 100%; display: flex; justify-content: space-between;">
+                            <select class="ghost astro-select" id="astroSelect" aria-label="Elegir astronauta"></select>
+                            <select class="ghost astro-select" id="astroDashboard"></select>
+                        </div>
+
                         <h1 id="astronaut-name" style="font-size:3lh;">Cargando perfil...</h1>
                         <div id="astronaut-name_subline" style="display: flex; height: 5px; background-color: black;"></div>
                         <p>Telemetría biomédica en tiempo real</p>
