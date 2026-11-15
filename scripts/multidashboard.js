@@ -117,8 +117,6 @@ async function buildControls() {
       select.appendChild(option);
     });
 
-    console.log(T.status(p.astronaut_id));
-
     card.querySelector(".start").addEventListener("click", () => T.start(select.value, p.astronaut_id));
     card.querySelector(".stop").addEventListener("click", () => T.stop(p.astronaut_id));
     grid.appendChild(card);
