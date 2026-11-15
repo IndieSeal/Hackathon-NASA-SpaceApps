@@ -33,16 +33,29 @@ function build(id) {
       </div>
       <div class="state"><i></i><b></b><span></span></div>
     </div>`;
+
   const q = s => el.querySelector(s);
-  q(".avatar").src = p.photo; q(".who b").textContent = p.name; q(".who span").textContent = id;
+  q(".avatar").src = p.photo;
+  q(".who b").textContent = p.name;
+  q(".who span").textContent = id;
+  
   const c = {el, i: 0, panel: q(".panel"), label: q(".label"), val: q(".val b"), unit: q(".val em"), cv: q("canvas"),
     state: q(".state"), sname: q(".state b"), sdesc: q(".state span")};
   el.querySelectorAll(".arr").forEach(b => b.addEventListener("click", () => {
     c.i = (c.i + Number(b.dataset.d) + T.metrics.length) % T.metrics.length; paint(id);
   }));
-  cards.set(id, c); root.appendChild(el);
+  cards.set(id, c);
+  root.appendChild(el);
+  
+  // Ir a dashboard con ID de astronauta
+  el.onclick = () => onAstronautClicked(id);
+  
   const e = $("mEmpty"); if (e) e.remove();
   return c;
+}
+
+function onAstronautClicked(id){
+  console.log(id);
 }
 
 function paint(id) {
