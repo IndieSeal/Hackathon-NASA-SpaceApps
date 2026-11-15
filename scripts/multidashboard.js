@@ -53,6 +53,7 @@ function build(id) {
   el.querySelectorAll(".arr").forEach(b => b.addEventListener("click", (e) => {
     e = e || window.event;
     e.preventDefault();
+    e.stopImmediatePropagation();
 
     c.i = (c.i + Number(b.dataset.d) + T.metrics.length) % T.metrics.length; paint(id);
   }));
