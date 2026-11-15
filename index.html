@@ -65,6 +65,7 @@
                 <div class="controls">
                     <span class="muted">Simulador disponible en el panel multi-astronauta</span>
                     <button class="ghost" id="persist" aria-pressed="false">Guardado en BD: apagado</button>
+                    <button class="ghost" id="oledBtn" aria-pressed="false">Conectar OLED</button>
                     <span class="muted" id="persistInfo" aria-live="polite"></span>
                 </div>
 
@@ -111,10 +112,12 @@
                 </div>
             </div>
           </main>
-      </div>
-      <div class="tip" id="tip" role="status"></div>
+    </div>
+    <div class="tip" id="tip" role="status"></div>
       
-      <script src="./scripts/graphics.js"></script>
-      <script src="./scripts/body.js"></script>
+    <script src="./scripts/graphics.js"></script>
+    <script src="./scripts/body.js"></script>
+    <script src="./scripts/telemetry.js"></script>
+    <script type="module" src="./scripts/oled.js"></script>
   </body>
 </html>

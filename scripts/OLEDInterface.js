@@ -4,55 +4,39 @@ export default class OLEDInterface {
 
     constructor(){}
 
+    queue = Promise.resolve();
+
     async connect() {
-        port = await navigator.serial.requestPort();
-        await port.open({
-            baudRate: 9600
-        });
-        writer = port.writable.getWriter();
+        if (!("serial" in navigator)) throw new Error("Web Serial no está disponible (usa Chrome o Edge)");
+        this.port = await navigator.serial.requestPort();
+        await this.port.open({ baudRate: 9600 });
+        this.writer = this.port.writable.getWriter();
     }
 
-    disconnect(){
-
+    async disconnect() {
+        await this.queue.catch(() => {});
+        this.writer?.releaseLock();
+        await this.port?.close();
+        this.writer = this.port = null;
     }
 
-    async write(data, payload){
-        /*
-            0 - Frecuencia Cardiaca: int (4 Bytes)
-            1 - Variabilidad: float (%.1f)
-            2 - Saturación: float (%.1f)
-            3 - Presión Arterial: (string + \0 (null terminator)) 
-            4 - Temperatura: float (%.1f)
-            5 - Frecuencia Respitaroria: int
-            6 - Indice de Choque: float (%.2f)
-            7 - Presión de Pulso: int
-        */
-
-
-        /*
-            DATA (1 byte) - Payload (Variable) - EOP (0xFF)
-        */
-       const encoder = new TextEncoder();
-       await this.writer(new Int8Array([data]));
-        switch(data){
-            case 0:
-            case 5:
-            case 7:
-                await this.writer(new Int32Array([payload]));
-                break;
-            case 1:
-            case 2:
-            case 4:
-            case 6:
-                await this.writer(new Float32Array([payload]));
-                break;
+    async write(data, payload) {
+        let body;
+        switch (data) {
+            case 0: case 5: case 7:
+                body = new Uint8Array(new Int32Array([Math.round(payload)]).buffer); break;
+            case 1: case 2: case 4: case 6:
+                body = new Uint8Array(new Float32Array([payload]).buffer); break;
             case 3:
-                await this.writer(encoder.encode(payload));
-                await this.writer(new Int8Array([0]));
-                break;
+                body = new Uint8Array([...new TextEncoder().encode(payload), 0]); break;
+            default:
+                throw new Error("Tipo de dato desconocido: " + data);
         }
-        await this.writer(new Int8Array([0xFF]));
+        const frame = new Uint8Array(body.length + 2);   // DATA + payload + 0xFF
+        frame[0] = data;
+        frame.set(body, 1);
+        frame[frame.length - 1] = 0xFF;
+        this.queue = this.queue.catch(() => {}).then(() => this.writer.write(frame));
+        return this.queue;
     }
-
-
 }
