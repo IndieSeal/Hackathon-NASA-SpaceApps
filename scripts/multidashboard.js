@@ -101,8 +101,8 @@ function syncControls() {
     c.light.classList.toggle("on", s.running);
     c.light.title = label; c.light.setAttribute("aria-label", label);
 
-    c.start.classList.toggle("on", s.running);
-    c.stop.classList.toggle("on", !s.running);
+    c.start.classList.toggle("on", !s.running);
+    c.stop.classList.toggle("on", s.running);
 
     /* El select sigue a la simulacion del servidor: al cargar toma la actual (o la ultima conocida); despues solo cambia si el servidor cambia */
     if (!c.init) { c.select.value = T.lastScenario(id); c.init = true; c.seen = s.scenario; }
