@@ -40,6 +40,13 @@ const series = {t:[], hr:[], spo2:[], hrv:[], sbp:[]};
 let last = null, lastColor = null, lastTs = null, wsOn = false, pollOk = false;
 let currentAstronautId = "AST-01";
 
+const reportesHTML = document.getElementById("reportesHTML");
+reportesHTML.onclick = verReportes;
+
+function verReportes(){
+  window.location.href = `/reportes.html?${currentAstronautId}`;
+}
+
 /* Charts */
 Chart.defaults.font.family = '"Instrument Sans", system-ui, sans-serif';
 Chart.defaults.color = "#7a8190";
