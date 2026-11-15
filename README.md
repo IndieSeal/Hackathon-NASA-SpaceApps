@@ -2,6 +2,8 @@
 
 Dashboard de monitoreo de salud para astronautas (HTML, CSS, JS y Chart.js).
 
+<img width="1455" height="912" alt="Captura de pantalla 2026-11-15 152052" src="https://github.com/user-attachments/assets/3879a1bf-15be-4b5b-9c6d-de3b1be25cfb" />
+
 ## Conexion con la API (Aerospace Health Monitoring Engine)
 
 La URL base es el mismo origen de la pagina. Si el dashboard se abre desde otro servidor, agrega `?api=http://localhost:8000` (la API permite CORS).
