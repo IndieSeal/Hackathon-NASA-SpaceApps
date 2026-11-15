@@ -12,7 +12,6 @@ La URL base es el mismo origen de la pagina. Si el dashboard se abre desde otro 
 | Cargar graficas al abrir / respaldo si cae el WS | `GET /history` |
 | Estado de Motor ML y Ollama | `GET /health` |
 | Botones de escenario y detener | `POST /stream/start/{escenario}`, `POST /stream/stop` |
-| Disparo unico (3 lecturas) | `POST /simulate/{escenario}` |
 | Reporte SBAR manual | `POST /report` |
 | Guardado en Postgres | `GET /persistence/status`, `POST /persistence/start`, `POST /persistence/stop` |
 
