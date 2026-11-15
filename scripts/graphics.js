@@ -1,3 +1,10 @@
+const buttonToDashboard = document.getElementById("astroDashboard");
+buttonToDashboard.onclick = returnToDash;
+
+function returnToDash(){
+  window.location.href = `/multi.html`;
+}
+
 (function(){
 "use strict";
 const sameOriginAsApi = location.port === "8000" || location.port === "";
