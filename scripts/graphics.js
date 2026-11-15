@@ -249,7 +249,9 @@ function persistUI(s){
 async function persistStatus(){ try { persistUI(await (await fetch(API + "/persistence/status")).json()); } catch(e){} }
 $("persist").addEventListener("click", async () => {
   try { persistUI(await (await post(persistOn ? "/persistence/stop" : "/persistence/start")).json()); }
-  catch(e){ $("persistInfo").textContent = "Sin respuesta del servidor"; }
+  catch(e){
+    $("persistInfo").textContent = "Sin respuesta del servidor";
+  }
 });
 
 /* Selector de astronauta: la API ya conoce los 4 perfiles, aqui solo se listan y se cambia el filtro activo */
@@ -257,7 +259,8 @@ async function loadAstronautProfileHeader(id){
   try {
     const p = await (await fetch(API + "/astronauts/" + encodeURIComponent(id))).json();
     astronautName.textContent = p.nombrec;
-  } catch(e){ /* se completara cuando llegue telemetria */ }
+  }
+  catch(e){ }
 }
 
 async function switchAstronaut(id){
@@ -289,7 +292,8 @@ async function initAstronautSelector(){
     select.value = currentAstronautId;
     select.addEventListener("change", () => switchAstronaut(select.value));
     await loadAstronautProfileHeader(currentAstronautId);
-  } catch(e){ /* API no disponible todavia, se reintenta con el sondeo de history/health */ }
+  }
+  catch(e){ }
 }
 
 (async function bootstrap(){
@@ -302,4 +306,5 @@ async function initAstronautSelector(){
   setInterval(() => { if (!wsOn) history(false); }, 2000);
   setInterval(health, 10000);
 })();
+
 })();

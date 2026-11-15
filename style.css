@@ -1,8 +1,3 @@
-
-/* ========================================
-   VARIABLES GLOBALES
-======================================== */
-
 :root {
     --page: #f7f8fa;
     --card: #fff;
@@ -18,11 +13,6 @@
     --accent: #3b6ef5;
     --tint: #f1faf5;
 }
-
-
-/* ========================================
-   ESTILOS GENERALES
-======================================== */
 
 * {
     box-sizing: border-box;
@@ -52,17 +42,11 @@ button {
     outline-offset: 2px;
 }
 
-
-/* ========================================
-   ESTRUCTURA PRINCIPAL
-======================================== */
-
 .app {
     display: grid;
     grid-template-columns: minmax(300px, 30vw) 1fr;
     height: 100vh;
 }
-
 .wrap {
     display: grid;
     gap: 16px;
@@ -71,22 +55,15 @@ button {
     margin: 0 auto;
     padding: 28px 24px 48px;
 }
-
 .card {
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: 14px;
 }
-
 .main {
     min-width: 0;
     overflow-y: auto;
 }
-
-
-/* ========================================
-   TIPOGRAFÍA
-======================================== */
 
 h1 {
     margin: 0;
@@ -95,7 +72,6 @@ h1 {
     font-weight: 600;
     letter-spacing: -0.01em;
 }
-
 h2 {
     margin: 0 0 12px;
 
@@ -107,11 +83,6 @@ h2 {
     color: var(--muted);
 }
 
-
-/* ========================================
-   HEADER
-======================================== */
-
 header {
     display: flex;
     justify-content: space-between;
@@ -119,16 +90,10 @@ header {
     flex-wrap: wrap;
     gap: 16px;
 }
-
 header p {
     margin: 2px 0 0;
     color: var(--muted);
 }
-
-
-/* ========================================
-   ESTADOS Y LEYENDA
-======================================== */
 
 .status {
     display: flex;
@@ -137,7 +102,6 @@ header p {
     color: var(--muted);
     font-size: 13px;
 }
-
 .status span {
     display: inline-flex;
     align-items: center;
@@ -153,23 +117,15 @@ header p {
     border-radius: 50%;
     background: #c4c9d2;
 }
-
 .dot.ok {
     background: var(--verde);
 }
-
 .dot.warn {
     background: var(--amarillo);
 }
-
 .dot.bad {
     background: var(--rojo);
 }
-
-
-/* ========================================
-   CONTROLES Y BOTONES
-======================================== */
 
 .controls {
     display: flex;
@@ -187,7 +143,6 @@ header p {
     border-radius: 10px;
     background: var(--soft);
 }
-
 .seg button {
     padding: 7px 14px;
 
@@ -198,11 +153,9 @@ header p {
     color: var(--muted);
     font-weight: 500;
 }
-
 .seg button:hover {
     color: var(--ink);
 }
-
 .seg button.on {
     background: #fff;
     color: var(--ink);
@@ -219,30 +172,21 @@ header p {
 
     font-weight: 500;
 }
-
 .astro-select {
     display: block;
     margin-bottom: 6px;
     font-size: 13px;
 }
-
 .ghost:hover {
     border-color: #cfd3da;
 }
-
 .ghost[disabled] {
     opacity: 0.5;
     cursor: default;
 }
-
 .controls .ghost.stop {
     margin-left: auto;
 }
-
-
-/* ========================================
-   PANEL PRINCIPAL (HERO)
-======================================== */
 
 .hero {
     display: grid;
@@ -256,31 +200,24 @@ header p {
 
     transition: background 0.4s;
 }
-
 .hero.VERDE {
     --tint: #f1faf5;
     --c: var(--verde);
 }
-
 .hero.AMARILLO {
     --tint: #fff8e6;
     --c: var(--amarillo);
 }
-
 .hero.ROJO {
     --tint: #fdeeee;
     --c: var(--rojo);
 }
-
 .hero.NONE {
     --tint: #fff;
     --c: #c4c9d2;
 
     border-color: var(--line);
 }
-
-
-/* Nivel */
 
 .level {
     display: flex;
@@ -292,7 +229,6 @@ header p {
     letter-spacing: -0.02em;
     line-height: 1.1;
 }
-
 .level i {
     flex: none;
 
@@ -303,23 +239,16 @@ header p {
     background: var(--c);
 }
 
-
-/* Predicción */
-
 .pred {
     margin: 6px 0 14px;
     font-size: 17px;
 }
-
-
-/* Etiquetas */
 
 .chips {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
 }
-
 .chip {
     padding: 3px 10px;
 
@@ -329,28 +258,21 @@ header p {
 
     font-size: 12.5px;
 }
-
 .chip.crit {
     border-color: var(--rojo);
     color: var(--rojo);
 }
-
 .chip.warn {
     border-color: var(--amarillo);
     color: #9a6c00;
 }
-
 .chip.none {
     color: var(--muted);
 }
 
-
-/* Confianza */
-
 .conf {
     text-align: right;
 }
-
 .conf b {
     display: block;
 
@@ -359,28 +281,20 @@ header p {
     letter-spacing: -0.02em;
     line-height: 1.1;
 }
-
 .conf small {
     display: block;
     color: var(--muted);
 }
-
 .conf .anom {
     margin-top: 10px;
     font-size: 13px;
 }
-
-
-/* ========================================
-   SIGNOS VITALES
-======================================== */
 
 .vitals {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     overflow: hidden;
 }
-
 .v {
     position: relative;
 
@@ -389,11 +303,9 @@ header p {
     border-right: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
 }
-
 .v:nth-child(4n) {
     border-right: 0;
 }
-
 .v:nth-child(n + 5) {
     border-bottom: 0;
 }
@@ -404,13 +316,11 @@ header p {
     color: var(--muted);
     font-size: 13px;
 }
-
 .v b {
     font-size: 28px;
     font-weight: 600;
     letter-spacing: -0.02em;
 }
-
 .v em {
     margin-left: 4px;
 
@@ -418,9 +328,6 @@ header p {
     font-size: 13px;
     font-style: normal;
 }
-
-
-/* Indicadores */
 
 .v::after {
     content: "";
@@ -435,37 +342,26 @@ header p {
     border-radius: 50%;
     background: transparent;
 }
-
 .v.warn::after {
     background: var(--amarillo);
 }
-
 .v.crit::after {
     background: var(--rojo);
 }
-
 .v.warn b {
     color: #9a6c00;
 }
-
 .v.crit b {
     color: var(--rojo);
 }
-
-
-/* ========================================
-   FILAS Y PANELES
-======================================== */
 
 .row {
     display: grid;
     gap: 16px;
 }
-
 .row.two {
     grid-template-columns: 1fr 1fr;
 }
-
 .row.bottom {
     grid-template-columns: 1fr 1.5fr;
 }
@@ -473,7 +369,6 @@ header p {
 .panel {
     padding: 20px 22px;
 }
-
 .ph {
     display: flex;
     justify-content: space-between;
@@ -481,21 +376,14 @@ header p {
 
     margin-bottom: 12px;
 }
-
 .ph h2 {
     margin: 0;
 }
-
-
-/* ========================================
-   GRÁFICOS Y REPORTES
-======================================== */
 
 .chart {
     position: relative;
     height: 230px;
 }
-
 .report {
     max-height: 280px;
     overflow: auto;
@@ -503,18 +391,12 @@ header p {
     white-space: pre-wrap;
     line-height: 1.65;
 }
-
 .meta {
     margin-top: 12px;
 
     color: var(--muted);
     font-size: 12.5px;
 }
-
-
-/* ========================================
-   ESTADOS DE CARGA
-======================================== */
 
 .pending {
     display: none;
@@ -524,7 +406,6 @@ header p {
     margin-bottom: 8px;
     color: var(--muted);
 }
-
 .spin {
     width: 12px;
     height: 12px;
@@ -542,11 +423,6 @@ header p {
     }
 }
 
-
-/* ========================================
-   PANEL CORPORAL
-======================================== */
-
 .body-panel {
     display: flex;
     flex-direction: column;
@@ -557,7 +433,6 @@ header p {
     border-right: 1px solid var(--line);
     background: #fff;
 }
-
 .body-panel svg {
     flex: 1;
 
@@ -567,7 +442,6 @@ header p {
     cursor: crosshair;
     touch-action: pan-y;
 }
-
 .hint {
     margin: 8px 0 0;
 
@@ -577,16 +451,10 @@ header p {
 }
 
 
-/* ========================================
-   ÓRGANOS
-   Solo se ven dentro de la lente
-======================================== */
-
 .organ {
     opacity: 0.9;
     transition: opacity 0.15s;
 }
-
 .organ.on {
     opacity: 1;
 }
@@ -594,26 +462,18 @@ header p {
 .organ.on .s {
     stroke-width: 4;
 }
-
 .organ.warn .s {
     stroke: var(--amarillo);
 }
-
 .organ.crit .s {
     stroke: var(--rojo);
 }
-
 .organ.heart .s {
     transform-box: fill-box;
     transform-origin: center;
 
     animation: beat var(--beat, 1s) ease-in-out infinite;
 }
-
-
-/* ========================================
-   ANIMACIONES
-======================================== */
 
 @keyframes beat {
     0%,
@@ -633,12 +493,6 @@ header p {
         transform: scale(1.05);
     }
 }
-
-
-/* ========================================
-   TOOLTIP FLOTANTE
-   Panel junto al cursor
-======================================== */
 
 .tip {
     position: fixed;
@@ -660,34 +514,25 @@ header p {
 
     transition: opacity 0.12s;
 }
-
 .tip.show {
     opacity: 1;
 }
-
-
-/* Encabezado */
 
 .th {
     display: flex;
     justify-content: space-between;
     gap: 8px;
 }
-
 .th b {
     display: block;
 
     font-size: 15px;
     font-weight: 600;
 }
-
 .th span {
     color: var(--muted);
     font-size: 12.5px;
 }
-
-
-/* Estado */
 
 .st {
     height: fit-content;
@@ -700,24 +545,18 @@ header p {
     font-style: normal;
     white-space: nowrap;
 }
-
 .st.ok {
     border-color: #bfe5d1;
     color: var(--verde);
 }
-
 .st.warn {
     border-color: var(--amarillo);
     color: #9a6c00;
 }
-
 .st.crit {
     border-color: var(--rojo);
     color: var(--rojo);
 }
-
-
-/* Valor principal */
 
 .big {
     display: flex;
@@ -726,20 +565,15 @@ header p {
 
     margin: 10px 0 4px;
 }
-
 .big b {
     font-size: 34px;
     font-weight: 600;
     letter-spacing: -0.02em;
     line-height: 1;
 }
-
 .big span {
     color: var(--muted);
 }
-
-
-/* Pulso */
 
 .pulse {
     width: 10px;
@@ -753,16 +587,12 @@ header p {
     animation: beat 1s ease-in-out infinite;
 }
 
-
-/* Gráfico */
-
 .tip canvas {
     display: block;
 
     width: 100%;
     height: 56px;
 }
-
 .cap {
     margin: 4px 0 10px;
 
@@ -770,32 +600,25 @@ header p {
     font-size: 12px;
 }
 
-
-/* Datos adicionales */
-
 .tip dl {
     display: grid;
     gap: 4px;
 
     margin: 0;
 }
-
 .tip dl div {
     display: flex;
     justify-content: space-between;
 
     font-size: 13px;
 }
-
 .tip dt {
     color: var(--muted);
 }
-
 .tip dd {
     margin: 0;
     font-weight: 500;
 }
-
 .found {
     margin-top: 10px;
 
@@ -803,93 +626,52 @@ header p {
     font-size: 12.5px;
 }
 
-
-/* ========================================
-   RESPONSIVE: TABLETS Y MÓVILES
-======================================== */
-
 @media (max-width: 960px) {
-
-    /* Estructura */
-
     body {
         overflow: auto;
     }
-
     .app {
         display: block;
         height: auto;
     }
-
     .body-panel {
         height: min(72vh, 560px);
 
         border-right: 0;
         border-bottom: 1px solid var(--line);
     }
-
     .main {
         overflow: visible;
     }
 
-
-    /* Signos vitales */
-
     .vitals {
         grid-template-columns: repeat(2, 1fr);
     }
-
     .v:nth-child(4n) {
         border-right: 1px solid var(--line);
     }
-
     .v:nth-child(2n) {
         border-right: 0;
     }
-
     .v:nth-child(n + 5) {
         border-bottom: 1px solid var(--line);
     }
-
     .v:nth-child(n + 7) {
         border-bottom: 0;
     }
 
-
-    /* Filas */
-
-    .row.two,
-    .row.bottom {
+    .row.two, .row.bottom {
         grid-template-columns: 1fr;
     }
-
-
-    /* Hero */
-
     .hero {
         grid-template-columns: 1fr;
         padding: 22px;
     }
-
     .conf {
         text-align: left;
     }
-
     .level {
         font-size: 36px;
-    }
-}
-
-
-/* ========================================
-   ACCESIBILIDAD
-   Respeta la preferencia de movimiento reducido
-======================================== */
-
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation: none !important;
-        transition: none !important;
     }
 }
 

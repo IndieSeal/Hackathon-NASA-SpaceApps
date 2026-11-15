@@ -16,7 +16,6 @@ function setState(on, error) {
   connected = on;
   btn.textContent = on ? "OLED conectada" : "Conectar OLED";
   btn.setAttribute("aria-pressed", on);
-  btn.title = error ? error.message : "";
 }
 
 btn.addEventListener("click", async () => {

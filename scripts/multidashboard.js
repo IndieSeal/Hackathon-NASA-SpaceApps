@@ -153,5 +153,10 @@ async function buildControls() {
 }
 
 buildControls();
-setInterval(() => { const on = T.connected(); $("mConn").className = "dot" + (on ? " on" : ""); $("mConnTxt").textContent = on ? "En vivo" : "Sondeo cada 2 s"; }, 1000);
+setInterval(() => {
+  const on = T.connected();
+  $("mConn").className = "dot" + (on ? " on" : "");
+  $("mConnTxt").textContent = on ? "En vivo" : "Sondeo cada 2 s";
+}, 1000);
+
 })();

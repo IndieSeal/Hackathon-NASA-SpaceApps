@@ -13,7 +13,9 @@
     --accent: #3b6ef5;
 }
 
-* { box-sizing: border-box; }
+* { 
+    box-sizing: border-box;
+}
 
 body {
     margin: 0;
@@ -43,7 +45,10 @@ header h1 {
     font-weight: 600;
 }
 
-.muted { color: var(--muted); margin: 0; }
+.muted {
+    color: var(--muted);
+    margin: 0;
+}
 
 .ghost {
     background: var(--card);
@@ -58,7 +63,10 @@ header h1 {
     white-space: nowrap;
 }
 
-.ghost:hover { border-color: var(--accent); color: var(--accent); }
+.ghost:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
 
 .empty {
     background: var(--card);
@@ -96,8 +104,12 @@ tbody td {
     vertical-align: middle;
 }
 
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover { background: #fafbfd; }
+tbody tr:last-child td {
+    border-bottom: none;
+}
+tbody tr:hover {
+    background: #fafbfd;
+}
 
 .badge {
     display: inline-block;
@@ -109,11 +121,26 @@ tbody tr:hover { background: #fafbfd; }
     border: 1px solid var(--line);
 }
 
-.badge.VERDE { color: var(--verde); border-color: var(--verde); background: #f1faf5; }
-.badge.AMARILLO { color: var(--amarillo); border-color: var(--amarillo); background: #fdf7e8; }
-.badge.ROJO { color: var(--rojo); border-color: var(--rojo); background: #fcefef; }
+.badge.VERDE {
+    color: var(--verde);
+    border-color: var(--verde);
+    background: #f1faf5;
+}
+.badge.AMARILLO {
+    color: var(--amarillo);
+    border-color: var(--amarillo);
+    background: #fdf7e8;
+}
+.badge.ROJO {
+    color: var(--rojo);
+    border-color: var(--rojo);
+    background: #fcefef;
+}
 
-.actions { display: flex; gap: 8px; }
+.actions {
+    display: flex;
+    gap: 8px;
+}
 
 .actions button, .actions a {
     font: inherit;
@@ -127,7 +154,10 @@ tbody tr:hover { background: #fafbfd; }
     text-decoration: none;
 }
 
-.actions button:hover, .actions a:hover { border-color: var(--accent); color: var(--accent); }
+.actions button:hover, .actions a:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
 
 .modal-overlay {
     display: none;
@@ -139,7 +169,9 @@ tbody tr:hover { background: #fafbfd; }
     z-index: 50;
 }
 
-.modal-overlay.open { display: flex; }
+.modal-overlay.open {
+    display: flex;
+}
 
 .modal-box {
     width: min(900px, 92vw);
