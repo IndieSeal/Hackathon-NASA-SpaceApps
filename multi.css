@@ -17,6 +17,14 @@ button{cursor:pointer}
 .bar input{width:110px}
 .ghost{font-weight:500}.ghost:hover{border-color:#cfd3da}
 
+.ghost.start.on{
+  background: #1f9d63;
+}
+
+.ghost.stop.on{
+  background: crimson;
+}
+
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:16px}
 .empty{grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);background:#fff;border:1px dashed var(--line);border-radius:14px}
 .mcard{display:grid;grid-template-columns:132px 1fr;gap:18px;padding:18px;background:#fff;border:1px solid var(--line);border-radius:14px;transition:0.2s;}

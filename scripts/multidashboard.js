@@ -100,6 +100,10 @@ function syncControls() {
     const s = T.simulation(id), label = s.running ? "Simulando" : "Detenido";
     c.light.classList.toggle("on", s.running);
     c.light.title = label; c.light.setAttribute("aria-label", label);
+
+    c.start.classList.toggle("on", s.running);
+    c.stop.classList.toggle("on", !s.running);
+
     /* El select sigue a la simulacion del servidor: al cargar toma la actual (o la ultima conocida); despues solo cambia si el servidor cambia */
     if (!c.init) { c.select.value = T.lastScenario(id); c.init = true; c.seen = s.scenario; }
     else if (s.scenario && s.scenario !== c.seen) { c.select.value = s.scenario; c.seen = s.scenario; }
@@ -133,7 +137,11 @@ async function buildControls() {
 
     card.querySelector(".start").addEventListener("click", () => T.start(select.value, p.astronaut_id));
     card.querySelector(".stop").addEventListener("click", () => T.stop(p.astronaut_id));
-    ctrls.set(p.astronaut_id, {light: card.querySelector(".ctrl-light"), select, init: false, seen: null});
+    ctrls.set(p.astronaut_id, {
+      light: card.querySelector(".ctrl-light"),
+      start: card.querySelector(".start"),
+      stop: card.querySelector(".stop"),
+      select, init: false, seen: null});
     grid.appendChild(card);
   });
   await T.ready;
