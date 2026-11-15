@@ -113,8 +113,12 @@ async function load() {
     }
 
     tbody.innerHTML = "";
-    reports.forEach(r => tbody.appendChild(renderRow(r)));
-    emptyEl.style.display = "none";
+    reports.forEach(r => {
+      let row = renderRow(r);
+      if(row) tbody.appendChild(row);
+    });
+    
+      emptyEl.style.display = "none";
     tableEl.style.display = "table";
   } catch (e) {
     emptyEl.textContent = "No se pudieron cargar los reportes. Verifica que la API este disponible.";
