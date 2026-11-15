@@ -161,22 +161,39 @@ function conn(){
 }
 
 async function history(initial){
-  try {
-    const r = await fetch(API + "/history"); if (!r.ok) throw 0;
-    const list = await r.json(); pollOk = true;
-    if (initial){
-      list.slice(-MAX).forEach(d => {
-        const t = d.raw_telemetry;
-        const namec = d.nombrec;
-        astronautName.innerHTML = namec;
-        series.t.push(clock(t.timestamp)); series.hr.push(t.hr); series.spo2.push(t.spo2); series.hrv.push(t.hrv_rmssd); series.sbp.push(t.sbp); 
-    });
-      if (list.length){ render(list[list.length - 1], false); lastColor = list[list.length - 1].nasa_alert_color; c1.update("none"); c2.update("none"); }
-    } else if (list.length && list[list.length - 1].raw_telemetry.timestamp !== lastTs){
-      onTelemetry(list[list.length - 1]);
+    try {
+        const r = await fetch(API + "/history"); if (!r.ok) throw 0;
+        const list = await r.json();
+        pollOk = true;
+        if (initial){
+            // For each user
+            list.slice(-MAX).forEach(d => {
+                const t = d.raw_telemetry;
+                const namec = d.nombrec;
+                astronautName.innerHTML = namec;
+                
+                series.t.push(clock(t.timestamp));
+                series.hr.push(t.hr);
+                series.spo2.push(t.spo2);
+                series.hrv.push(t.hrv_rmssd);
+                series.sbp.push(t.sbp); 
+            });
+
+            if (list.length){
+                render(list[list.length - 1], false);
+                lastColor = list[list.length - 1].nasa_alert_color;
+                c1.update("none");
+                c2.update("none");
+            }
+        }
+        else if (list.length && list[list.length - 1].raw_telemetry.timestamp !== lastTs){
+            onTelemetry(list[list.length - 1]);
+        }
     }
-  } catch(e){ pollOk = false; }
-  conn();
+    catch(e){
+        pollOk = false;
+    }
+    conn();
 }
 
 let delay = 1000;
