@@ -38,7 +38,7 @@ $("modalClose").addEventListener("click", closePreview);
 modalOverlay.addEventListener("click", e => { if (e.target === modalOverlay) closePreview(); });
 
 function renderRow(r) {
-  console.log(r.astronaut_id);
+  console.log(r.astronaut_id.trim());
   console.log(window.location.search.substring(1));
   console.log("Wait, they dont love you like i love you, WAIT, tararara");
 
