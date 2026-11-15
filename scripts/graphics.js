@@ -249,6 +249,8 @@ async function loadAstronautProfileHeader(id){
 async function switchAstronaut(id){
   currentAstronautId = id;
   resetDashboardState();
+
+  window.location.search = `?${id}`
   await Promise.all([loadAstronautProfileHeader(id), history(true)]);
 }
 
