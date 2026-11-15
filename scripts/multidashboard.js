@@ -31,7 +31,11 @@ function build(id) {
         <div class="nav"><button class="arr" data-d="-1" aria-label="Métrica anterior">&#8249;</button><span class="label"></span><button class="arr" data-d="1" aria-label="Métrica siguiente">&#8250;</button></div>
         <div class="val"><b></b><em></em></div><canvas width="520" height="104"></canvas>
       </div>
-      <div class="state"><i></i><b></b><span></span></div>
+      <div class="state">
+        <i></i>
+        <b></b>
+        <span></span>
+      </div>
     </div>`;
 
   const q = s => el.querySelector(s);
@@ -39,8 +43,13 @@ function build(id) {
   q(".who b").textContent = p.name;
   q(".who span").textContent = id;
   
-  const c = {el, i: 0, panel: q(".panel"), label: q(".label"), val: q(".val b"), unit: q(".val em"), cv: q("canvas"),
-    state: q(".state"), sname: q(".state b"), sdesc: q(".state span")};
+  const c = {
+    el, i: 0, panel: q(".panel"), label: q(".label"), val: q(".val b"), unit: q(".val em"), cv: q("canvas"),
+    state: q(".state"),
+    sname: q(".state b"),
+    sdesc: q(".state span")
+  };
+
   el.querySelectorAll(".arr").forEach(b => b.addEventListener("click", () => {
     c.i = (c.i + Number(b.dataset.d) + T.metrics.length) % T.metrics.length; paint(id);
   }));
@@ -62,17 +71,26 @@ function onAstronautClicked(id){
 function paint(id) {
   const c = cards.get(id) || build(id), m = T.metric(id, T.metrics[c.i].key);
   if (!m) return;
-  c.label.textContent = m.label; c.val.textContent = m.text; c.unit.textContent = m.unit;
+  c.label.textContent = m.label;
+  c.val.textContent = m.text;
+  c.unit.textContent = m.unit;
   c.panel.dataset.status = m.status;
+  
   const [cls, name] = LV[T.alert(id)] || ["", "Sin datos"];
-  c.state.className = "state " + cls; c.sname.textContent = name; c.sdesc.textContent = pretty(T.prediction(id));
+  c.state.className = "state " + cls;
+  c.sname.textContent = name;
+  c.sdesc.textContent = pretty(T.prediction(id));
+  
+  //Set m status to selected option from each of the astronauts
+  console.log(m.status);
+
   spark(c.cv, m.series, m.status);
 }
 
 T.on(id => paint(id));
 T.ready.then(() => T.astronauts().forEach(paint));
 
-/* Controles: una tarjeta fija por astronauta, cada una con su propio escenario e inicio/disparo/detener */
+/* Controles: una tarjeta fija por astronauta, cada una con su propio escenario e inicio/detener */
 const SCENARIOS = [["nominal", "Nominal"], ["ansiedad", "Ansiedad"], ["cardiovascular", "Cardiovascular"], ["infeccion", "Infección"]];
 
 async function buildControls() {
@@ -95,7 +113,9 @@ async function buildControls() {
     const select = card.querySelector("select");
     SCENARIOS.forEach(([value, label]) => {
       const option = document.createElement("option");
-      option.value = value; option.textContent = label;
+      console.log(value);
+      option.value = value;
+      option.textContent = label;
       select.appendChild(option);
     });
     card.querySelector(".start").addEventListener("click", () => T.start(select.value, p.astronaut_id));
