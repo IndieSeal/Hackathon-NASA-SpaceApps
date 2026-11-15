@@ -42,7 +42,7 @@ function renderRow(r) {
   console.log(window.location.search.substring(1));
   console.log("Wait, they dont love you like i love you, WAIT, tararara");
 
-  if(window.location.search.length > 2 && r.astronaut_id != window.location.search.substring(1)) return;
+  if(window.location.search.length > 2 && r.astronaut_id.trim().localeCompare(window.location.search.substring(1)) != 0) return;
 
   const tr = document.createElement("tr");
 
