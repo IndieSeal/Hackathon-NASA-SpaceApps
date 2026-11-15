@@ -41,7 +41,7 @@ let last = null, lastColor = null, lastTs = null, wsOn = false, pollOk = false;
 let currentAstronautId = "AST-01";
 
 const reportesHTML = document.getElementById("reportesHTML");
-reportesHTML.onclick = verReportes;
+if(reportesHTML) reportesHTML.onclick = verReportes;
 
 function verReportes(){
   window.location.href = `/reportes.html?${currentAstronautId}`;
