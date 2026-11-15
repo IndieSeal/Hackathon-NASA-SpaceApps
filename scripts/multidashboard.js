@@ -97,32 +97,43 @@ async function buildControls() {
   if (!grid) return;
   let profiles = [];
   try { profiles = await T.listProfiles(); } catch (e) { /* sin conexion */ }
-  grid.innerHTML = "";
-  profiles.forEach(p => {
-    const card = document.createElement("div");
-    card.className = "ctrl-card";
-    card.innerHTML = `<b></b><span class="ctrl-id muted"></span>
-      <select aria-label="Escenario"></select>
-      <div class="ctrl-actions">
-        <button class="ghost start">Iniciar</button>
-        <button class="ghost stop">Detener</button>
-      </div>`;
-    card.querySelector("b").textContent = p.nombrec;
-    card.querySelector(".ctrl-id").textContent = p.astronaut_id;
-    const select = card.querySelector("select");
-    SCENARIOS.forEach(([value, label]) => {
-      const option = document.createElement("option");
-      option.value = value;
-      option.textContent = label;
-      select.appendChild(option);
+  
+  try{
+    const r = await fetch(API + "/stream/status"); if (!r.ok) throw 0;
+    const list = await r.json();
+    
+    list.slice(-25).forEach(d => {
+      console.log(d.scenario);
     });
 
-    console.log(T.status(p.astronaut_id));
+    grid.innerHTML = "";
+    profiles.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "ctrl-card";
+      card.innerHTML = `<b></b><span class="ctrl-id muted"></span>
+        <select aria-label="Escenario"></select>
+        <div class="ctrl-actions">
+          <button class="ghost start">Iniciar</button>
+          <button class="ghost stop">Detener</button>
+        </div>`;
+      card.querySelector("b").textContent = p.nombrec;
+      card.querySelector(".ctrl-id").textContent = p.astronaut_id;
+      const select = card.querySelector("select");
+      SCENARIOS.forEach(([value, label]) => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = label;
+        select.appendChild(option);
+      });
 
-    card.querySelector(".start").addEventListener("click", () => T.start(select.value, p.astronaut_id));
-    card.querySelector(".stop").addEventListener("click", () => T.stop(p.astronaut_id));
-    grid.appendChild(card);
-  });
+      card.querySelector(".start").addEventListener("click", () => T.start(select.value, p.astronaut_id));
+      card.querySelector(".stop").addEventListener("click", () => T.stop(p.astronaut_id));
+      grid.appendChild(card);
+    });
+  }
+  catch{
+
+  }
 }
 
 buildControls();
