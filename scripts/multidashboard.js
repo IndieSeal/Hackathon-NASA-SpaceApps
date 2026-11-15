@@ -44,11 +44,12 @@ function build(id) {
   el.querySelectorAll(".arr").forEach(b => b.addEventListener("click", () => {
     c.i = (c.i + Number(b.dataset.d) + T.metrics.length) % T.metrics.length; paint(id);
   }));
-  cards.set(id, c);
-  root.appendChild(el);
-  
+
   // Ir a dashboard con ID de astronauta
   el.onclick = () => onAstronautClicked(id);
+
+  cards.set(id, c);
+  root.appendChild(el);
   
   const e = $("mEmpty"); if (e) e.remove();
   return c;
@@ -56,6 +57,7 @@ function build(id) {
 
 function onAstronautClicked(id){
   console.log(id);
+  window.location.href = '/index.html';
 }
 
 function paint(id) {
