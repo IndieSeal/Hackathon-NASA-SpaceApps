@@ -106,7 +106,8 @@ window.Telemetry = {
   onReport: fn => { repListeners.add(fn); return () => repListeners.delete(fn); },
   start: (scenario, id = "AST-01") => post("/stream/start/" + scenario + q(id)),
   shot: (scenario, id = "AST-01") => post("/simulate/" + scenario + q(id)),
-  stop: () => post("/stream/stop")
+  stop: (id = "AST-01") => post("/stream/stop" + q(id)),
+  listProfiles: () => fetch(API + "/astronauts").then(r => r.json())
 };
 
 socket();

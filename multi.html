@@ -18,18 +18,8 @@
           <h1>Astronautas en vivo</h1>
           <span class="muted"><i class="dot" id="mConn"></i><span id="mConnTxt">Conectando</span></span>
         </div>
-        <div class="bar">
-          <input id="mId" value="AST-01" aria-label="ID del astronauta">
-          <select id="mSc" aria-label="Escenario">
-            <option value="nominal">Nominal</option>
-            <option value="ansiedad">Ansiedad</option>
-            <option value="cardiovascular">Cardiovascular</option>
-            <option value="infeccion">Infección</option>
-          </select>
-          <button class="ghost" id="mStart">Iniciar stream</button>
-          <button class="ghost" id="mStop">Detener</button>
-        </div>
       </header>
+      <section class="ctrl-grid" id="ctrlGrid"></section>
       <section class="grid" id="multi"><div class="empty" id="mEmpty">Sin astronautas todavía. Elige un escenario para iniciar la telemetría.</div></section>
     </div>
     <script src="./scripts/telemetry.js"></script>
