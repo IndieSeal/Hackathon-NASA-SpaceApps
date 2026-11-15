@@ -892,3 +892,10 @@ header p {
         transition: none !important;
     }
 }
+
+a.ghost {
+    text-decoration: none;
+    color: inherit;
+    display: inline-flex;
+    align-items: center;
+}

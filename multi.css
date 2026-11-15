@@ -55,3 +55,4 @@ button{cursor:pointer}
 .ctrl-actions button{flex:1;padding:7px 8px;font-size:13px}
 .ctrl-actions button[disabled]{opacity:.5;cursor:default}
 .ctrl-status{font-size:12.5px}
+a.ghost{text-decoration:none;color:inherit;display:inline-flex;align-items:center}
