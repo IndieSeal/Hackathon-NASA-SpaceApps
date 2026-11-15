@@ -81,8 +81,7 @@ function paint(id) {
   c.sname.textContent = name;
   c.sdesc.textContent = pretty(T.prediction(id));
   
-  //Set m status to selected option from each of the astronauts
-  console.log(m.status);
+  //Set status to selected option from each of the astronauts
 
   spark(c.cv, m.series, m.status);
 }
@@ -113,11 +112,13 @@ async function buildControls() {
     const select = card.querySelector("select");
     SCENARIOS.forEach(([value, label]) => {
       const option = document.createElement("option");
-      console.log(value);
       option.value = value;
       option.textContent = label;
       select.appendChild(option);
     });
+
+    console.log(T.status(p.astronaut_id));
+
     card.querySelector(".start").addEventListener("click", () => T.start(select.value, p.astronaut_id));
     card.querySelector(".stop").addEventListener("click", () => T.stop(p.astronaut_id));
     grid.appendChild(card);
