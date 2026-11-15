@@ -31,6 +31,7 @@ const clock = ts => new Date(ts * 1000).toLocaleTimeString("es-MX", {hour12:fals
 
 const series = {t:[], hr:[], spo2:[], hrv:[], sbp:[]};
 let last = null, lastColor = null, lastTs = null, wsOn = false, pollOk = false;
+let currentAstronautId = "AST-01";
 
 /* Charts */
 Chart.defaults.font.family = '"Instrument Sans", system-ui, sans-serif';
@@ -110,10 +111,34 @@ function render(d, pushPoint){
 }
 
 function onTelemetry(d){
+  if (d.astronaut_id !== currentAstronautId) return;
   render(d, true);
   const c = d.nasa_alert_color;
   if ((c === "AMARILLO" || c === "ROJO") && c !== lastColor && wsOn) $("pend").style.display = "flex";
   lastColor = c;
+}
+
+function resetDashboardState(){
+  series.t.length = 0; series.hr.length = 0; series.spo2.length = 0; series.hrv.length = 0; series.sbp.length = 0;
+  c1.update("none"); c2.update("none");
+  c3.data.datasets[0].data = CLASSES.map(() => 0);
+  c3.data.datasets[0].backgroundColor = CLASSES.map(() => "#e5e7eb");
+  c3.update("none");
+  $("hero").className = "card hero NONE";
+  $("level").textContent = "Sin datos";
+  $("pred").textContent = "Esperando telemetría desde el panel multi-astronauta";
+  $("conf").textContent = "--";
+  $("anom").textContent = "Astronauta: --";
+  $("chips").innerHTML = '<span class="chip none">Sin hallazgos activos</span>';
+  for (const k in BY_CARD) $("k-" + k).className = "v";
+  $("v-hr").textContent = "--"; $("v-hrv").textContent = "--"; $("v-spo2").textContent = "--";
+  $("v-bp").textContent = "--/--"; $("v-temp").textContent = "--"; $("v-resp").textContent = "--";
+  $("v-shock").textContent = "--"; $("v-pulse").textContent = "--";
+  $("pend").style.display = "none";
+  $("rep").textContent = "Aún no hay reportes. Se genera uno automáticamente cuando la alerta pasa a amarillo o rojo.";
+  $("repMeta").textContent = "";
+  last = null; lastColor = null; lastTs = null;
+  $("gen").disabled = true;
 }
 function showReport(r){
   $("pend").style.display = "none";
@@ -125,14 +150,6 @@ function showReport(r){
 /* API */
 const post = (path, body) => fetch(API + path, {method:"POST", headers:body ? {"Content-Type":"application/json"} : undefined, body:body ? JSON.stringify(body) : undefined});
 
-document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", async () => {
-  document.querySelectorAll(".seg button").forEach(x => x.classList.toggle("on", x === b));
-  try { await post("/stream/start/" + b.dataset.s); } catch(e){ console.error(e); }
-}));
-$("stop").addEventListener("click", async () => {
-  document.querySelectorAll(".seg button").forEach(x => x.classList.remove("on"));
-  try { await post("/stream/stop"); } catch(e){ console.error(e); }
-});
 $("gen").addEventListener("click", async () => {
   if (!last) return;
   $("gen").disabled = true; $("pend").style.display = "flex";
@@ -163,7 +180,7 @@ function conn(){
 
 async function history(initial){
     try {
-        const r = await fetch(API + "/history"); if (!r.ok) throw 0;
+        const r = await fetch(API + "/history?astronaut_id=" + encodeURIComponent(currentAstronautId)); if (!r.ok) throw 0;
         const list = await r.json();
         pollOk = true;
         if (initial){
@@ -221,11 +238,46 @@ $("persist").addEventListener("click", async () => {
   catch(e){ $("persistInfo").textContent = "Sin respuesta del servidor"; }
 });
 
-history(true);
-health();
-socket();
-persistStatus();
-setInterval(persistStatus, 5000);
-setInterval(() => { if (!wsOn) history(false); }, 2000);
-setInterval(health, 10000);
+/* Selector de astronauta: la API ya conoce los 4 perfiles, aqui solo se listan y se cambia el filtro activo */
+async function loadAstronautProfileHeader(id){
+  try {
+    const p = await (await fetch(API + "/astronauts/" + encodeURIComponent(id))).json();
+    astronautName.textContent = p.nombrec;
+  } catch(e){ /* se completara cuando llegue telemetria */ }
+}
+
+async function switchAstronaut(id){
+  currentAstronautId = id;
+  resetDashboardState();
+  await Promise.all([loadAstronautProfileHeader(id), history(true)]);
+}
+
+async function initAstronautSelector(){
+  try {
+    const profiles = await (await fetch(API + "/astronauts")).json();
+    const select = $("astroSelect");
+    select.innerHTML = "";
+    profiles.forEach(p => {
+      const option = document.createElement("option");
+      option.value = p.astronaut_id;
+      option.textContent = p.nombrec + " (" + p.astronaut_id + ")";
+      select.appendChild(option);
+    });
+    if (profiles.length) currentAstronautId = profiles[0].astronaut_id;
+    select.value = currentAstronautId;
+    select.addEventListener("change", () => switchAstronaut(select.value));
+    await loadAstronautProfileHeader(currentAstronautId);
+  } catch(e){ /* API no disponible todavia, se reintenta con el sondeo de history/health */ }
+}
+
+(async function bootstrap(){
+  await initAstronautSelector();
+  history(true);
+  health();
+  socket();
+  persistStatus();
+  setInterval(persistStatus, 5000);
+  setInterval(() => { if (!wsOn) history(false); }, 2000);
+  setInterval(health, 10000);
+})();
 })();

@@ -58,10 +58,38 @@ function paint(id) {
 T.on(id => paint(id));
 T.ready.then(() => T.astronauts().forEach(paint));
 
-/* Barra de control */
-const who = () => ($("mId").value.trim() || "AST-01");
-$("mStart").addEventListener("click", () => T.start($("mSc").value, who()));
-$("mShot").addEventListener("click", () => T.shot($("mSc").value, who()));
-$("mStop").addEventListener("click", () => T.stop());
+/* Controles: una tarjeta fija por astronauta, cada una con su propio escenario e inicio/disparo/detener */
+const SCENARIOS = [["nominal", "Nominal"], ["ansiedad", "Ansiedad"], ["cardiovascular", "Cardiovascular"], ["infeccion", "Infección"]];
+
+async function buildControls() {
+  const grid = $("ctrlGrid");
+  if (!grid) return;
+  let profiles = [];
+  try { profiles = await T.listProfiles(); } catch (e) { /* sin conexion */ }
+  grid.innerHTML = "";
+  profiles.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "ctrl-card";
+    card.innerHTML = `<b></b><span class="ctrl-id muted"></span>
+      <select aria-label="Escenario"></select>
+      <div class="ctrl-actions">
+        <button class="ghost start">Iniciar</button>
+        <button class="ghost stop">Detener</button>
+      </div>`;
+    card.querySelector("b").textContent = p.nombrec;
+    card.querySelector(".ctrl-id").textContent = p.astronaut_id;
+    const select = card.querySelector("select");
+    SCENARIOS.forEach(([value, label]) => {
+      const option = document.createElement("option");
+      option.value = value; option.textContent = label;
+      select.appendChild(option);
+    });
+    card.querySelector(".start").addEventListener("click", () => T.start(select.value, p.astronaut_id));
+    card.querySelector(".stop").addEventListener("click", () => T.stop(p.astronaut_id));
+    grid.appendChild(card);
+  });
+}
+
+buildControls();
 setInterval(() => { const on = T.connected(); $("mConn").className = "dot" + (on ? " on" : ""); $("mConnTxt").textContent = on ? "En vivo" : "Sondeo cada 2 s"; }, 1000);
 })();

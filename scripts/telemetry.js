@@ -107,7 +107,8 @@ window.Telemetry = {
   start: (scenario, id = "AST-01") => post("/stream/start/" + scenario + q(id)),
   shot: (scenario, id = "AST-01") => post("/simulate/" + scenario + q(id)),
   stop: (id = "AST-01") => post("/stream/stop" + q(id)),
-  listProfiles: () => fetch(API + "/astronauts").then(r => r.json())
+  listProfiles: () => fetch(API + "/astronauts").then(r => r.json()),
+  streamStatus: () => fetch(API + "/stream/status").then(r => r.json())
 };
 
 socket();

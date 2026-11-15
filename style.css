@@ -220,6 +220,12 @@ header p {
     font-weight: 500;
 }
 
+.astro-select {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+}
+
 .ghost:hover {
     border-color: #cfd3da;
 }

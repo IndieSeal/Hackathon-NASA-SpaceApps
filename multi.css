@@ -45,3 +45,13 @@ button{cursor:pointer}
 .state.warn{background:#fff8e6}.state.warn i{background:var(--amarillo)}
 .state.crit{background:#fdeeee}.state.crit i{background:var(--rojo)}
 @media (max-width:520px){.grid{grid-template-columns:1fr}.mcard{grid-template-columns:96px 1fr}}
+
+.ctrl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.ctrl-card{display:grid;gap:8px;padding:14px;background:#fff;border:1px solid var(--line);border-radius:14px;align-content:start}
+.ctrl-card b{font-weight:600;overflow-wrap:anywhere}
+.ctrl-card .ctrl-id{font-size:12.5px}
+.ctrl-card select{width:100%;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px}
+.ctrl-actions{display:flex;gap:6px;flex-wrap:wrap}
+.ctrl-actions button{flex:1;padding:7px 8px;font-size:13px}
+.ctrl-actions button[disabled]{opacity:.5;cursor:default}
+.ctrl-status{font-size:12.5px}

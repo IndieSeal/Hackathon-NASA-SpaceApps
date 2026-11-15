@@ -49,7 +49,8 @@
             <div class="wrap">
                 <header>
                     <div>
-                        <h1 id="astronaut-name" style="font-size:3lh;">Mimic William David Henry Afton</h1>
+                        <select class="ghost astro-select" id="astroSelect" aria-label="Elegir astronauta"></select>
+                        <h1 id="astronaut-name" style="font-size:3lh;">Cargando perfil...</h1>
                         <div id="astronaut-name_subline" style="display: flex; height: 5px; background-color: black;"></div>
                         <p>Telemetría biomédica en tiempo real</p>
                     </div>
@@ -61,15 +62,9 @@
                 </header>
 
                 <div class="controls">
-                    <div class="seg" role="group" aria-label="Escenario de simulación">
-                        <button data-s="nominal">Nominal</button>
-                        <button data-s="ansiedad">Ansiedad</button>
-                        <button data-s="cardiovascular">Cardiovascular</button>
-                        <button data-s="infeccion">Infección</button>
-                    </div>
+                    <span class="muted">Simulador disponible en el panel multi-astronauta</span>
                     <button class="ghost" id="persist" aria-pressed="false">Guardado en BD: apagado</button>
                     <span class="muted" id="persistInfo" aria-live="polite"></span>
-                    <button class="ghost stop" id="stop">Detener simulación</button>
                 </div>
 
                 <section class="card hero NONE" id="hero">
