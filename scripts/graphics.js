@@ -263,7 +263,13 @@ async function initAstronautSelector(){
       option.textContent = p.nombrec + " (" + p.astronaut_id + ")";
       select.appendChild(option);
     });
-    if (profiles.length) currentAstronautId = profiles[0].astronaut_id;
+
+    if (profiles.length) {
+      const rawQuery = window.location.search.substring(1); // removes the '?'
+      if(rawQuery.length > 2) currentAstronautId = rawQuery;
+      else currentAstronautId = profiles[0].astronaut_id;
+      console.log(rawQuery);
+    }
     select.value = currentAstronautId;
     select.addEventListener("change", () => switchAstronaut(select.value));
     await loadAstronautProfileHeader(currentAstronautId);
