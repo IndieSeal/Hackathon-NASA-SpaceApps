@@ -56,3 +56,8 @@ button{cursor:pointer}
 .ctrl-actions button[disabled]{opacity:.5;cursor:default}
 .ctrl-status{font-size:12.5px}
 a.ghost{text-decoration:none;color:inherit;display:inline-flex;align-items:center}
+
+.ctrl-card{position:relative}
+.ctrl-card b{padding-right:22px}
+.ctrl-light{position:absolute;top:14px;right:14px;width:10px;height:10px;border-radius:50%;background:#c4c9d2;transition:background .2s,box-shadow .2s}
+.ctrl-light.on{background:var(--verde);box-shadow:0 0 0 4px rgba(31,157,99,.18)}

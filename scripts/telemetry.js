@@ -86,6 +86,36 @@ async function pull() {
 const post = path => fetch(API + path, {method: "POST"}).then(r => r.json());
 const q = id => "?astronaut_id=" + encodeURIComponent(id);
 
+/* Estado de simulacion: lo guarda el backend (GET /stream/status). Aqui solo se consulta; nada se guarda en el navegador. */
+const RUN = /^(started|running|active|simulating)$/i;
+const PRED2SC = {NOMINAL: "nominal", ATAQUE_ANSIEDAD: "ansiedad", EVENTO_CARDIOVASCULAR: "cardiovascular", INFECCION_ENFERMEDAD: "infeccion"};
+let sims = new Map(), simTimer = 0;
+const simListeners = new Set();
+
+/* UNICO punto que depende de la forma de la respuesta de /stream/status.
+   Acepta: lista de {astronaut_id, scenario, running|status}, {streams: [...]}, o un objeto {"AST-01": {...}}.
+   Devuelve Map(id -> {running, scenario}). */
+function parseStreams(raw) {
+  const out = new Map();
+  const add = (id, e) => {
+    if (!id || !e || typeof e !== "object") return;
+    const run = e.running ?? e.active ?? e.simulating ?? RUN.test(e.status || "");
+    out.set(id, {running: !!run, scenario: e.scenario ?? e.scenario_name ?? e.last_scenario ?? null});
+  };
+  const list = Array.isArray(raw) ? raw : raw && Array.isArray(raw.streams) ? raw.streams : null;
+  if (list) list.forEach(e => add(e && e.astronaut_id, e));
+  else if (raw && raw.astronaut_id) add(raw.astronaut_id, raw);
+  else Object.entries((raw && raw.streams) || raw || {}).forEach(([id, e]) => add(id, e));
+  return out;
+}
+async function refreshSimulations() {
+  try {
+    const r = await fetch(API + "/stream/status");
+    if (r.ok) { sims = parseStreams(await r.json()); simListeners.forEach(fn => fn(sims)); }
+  } catch (e) { /* sin conexion: se conserva el ultimo estado */ }
+  return sims;
+}
+
 window.Telemetry = {
   metrics: M.map(({key, label, unit}) => ({key, label, unit})),
   ready: pull(),
@@ -104,11 +134,17 @@ window.Telemetry = {
   connected: () => wsOn,
   on: fn => { listeners.add(fn); return () => listeners.delete(fn); },
   onReport: fn => { repListeners.add(fn); return () => repListeners.delete(fn); },
-  start: (scenario, id = "AST-01") => post("/stream/start/" + scenario + q(id)),
+  start: (scenario, id = "AST-01") => post("/stream/start/" + scenario + q(id)).then(r => { refreshSimulations(); return r; }),
   shot: (scenario, id = "AST-01") => post("/simulate/" + scenario + q(id)),
-  stop: (id = "AST-01") => post("/stream/stop" + q(id)),
+  stop: (id = "AST-01") => post("/stream/stop" + q(id)).then(r => { refreshSimulations(); return r; }),
   listProfiles: () => fetch(API + "/astronauts").then(r => r.json()),
-  streamStatus: () => fetch(API + "/stream/status").then(r => r.json())
+  streamStatus: () => fetch(API + "/stream/status").then(r => r.json()),
+  /* Simulacion por astronauta (siempre consultada al backend) */
+  isSimulating: async id => (await refreshSimulations()).get(id)?.running === true,   // Promise<boolean>
+  simulation: id => sims.get(id) ?? {running: false, scenario: null},                  // ultimo estado consultado, sincrono
+  lastScenario: id => sims.get(id)?.scenario ?? PRED2SC[store.get(id)?.latest?.primary_prediction] ?? "nominal",
+  refreshSimulations,
+  onSimulation: fn => { simListeners.add(fn); if (!simTimer) simTimer = setInterval(refreshSimulations, 2000); return () => simListeners.delete(fn); }
 };
 
 socket();

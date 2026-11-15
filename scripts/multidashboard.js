@@ -92,6 +92,18 @@ T.ready.then(() => T.astronauts().forEach(paint));
 /* Controles: una tarjeta fija por astronauta, cada una con su propio escenario e inicio/detener */
 const SCENARIOS = [["nominal", "Nominal"], ["ansiedad", "Ansiedad"], ["cardiovascular", "Cardiovascular"], ["infeccion", "Infección"]];
 
+const ctrls = new Map();
+function syncControls() {
+  ctrls.forEach((c, id) => {
+    const s = T.simulation(id), label = s.running ? "Simulando" : "Detenido";
+    c.light.classList.toggle("on", s.running);
+    c.light.title = label; c.light.setAttribute("aria-label", label);
+    /* El select sigue a la simulacion del servidor: al cargar toma la actual (o la ultima conocida); despues solo cambia si el servidor cambia */
+    if (!c.init) { c.select.value = T.lastScenario(id); c.init = true; c.seen = s.scenario; }
+    else if (s.scenario && s.scenario !== c.seen) { c.select.value = s.scenario; c.seen = s.scenario; }
+  });
+}
+
 async function buildControls() {
   const grid = $("ctrlGrid");
   if (!grid) return;
@@ -101,7 +113,7 @@ async function buildControls() {
   profiles.forEach(p => {
     const card = document.createElement("div");
     card.className = "ctrl-card";
-    card.innerHTML = `<b></b><span class="ctrl-id muted"></span>
+    card.innerHTML = `<i class="ctrl-light" role="img" aria-label="Detenido" title="Detenido"></i><b></b><span class="ctrl-id muted"></span>
       <select aria-label="Escenario"></select>
       <div class="ctrl-actions">
         <button class="ghost start">Iniciar</button>
@@ -119,8 +131,13 @@ async function buildControls() {
 
     card.querySelector(".start").addEventListener("click", () => T.start(select.value, p.astronaut_id));
     card.querySelector(".stop").addEventListener("click", () => T.stop(p.astronaut_id));
+    ctrls.set(p.astronaut_id, {light: card.querySelector(".ctrl-light"), select, init: false, seen: null});
     grid.appendChild(card);
   });
+  await T.ready;
+  await T.refreshSimulations();
+  syncControls();
+  T.onSimulation(syncControls);
 }
 
 buildControls();

@@ -32,3 +32,16 @@ Telemetry.profile("AST-01")        // {id, name, photo}; se edita en PROFILES o 
 ```
 
 `multi.html` + `scripts/multidashboard.js` son un ejemplo: un panel por astronauta con flechas para cambiar de metrica.
+
+## Estado de simulacion por astronauta
+
+El estado vive en el backend (`GET /stream/status`); el navegador no guarda nada.
+
+```js
+await Telemetry.isSimulating("AST-01")  // true si esta simulando, false si esta detenido
+Telemetry.simulation("AST-01")          // {running, scenario} del ultimo sondeo (sincrono)
+Telemetry.lastScenario("AST-01")        // escenario actual o el ultimo conocido
+Telemetry.onSimulation(map => { ... })  // se llama cada 2 s y despues de iniciar o detener
+```
+
+La forma de la respuesta de `/stream/status` se interpreta en un solo lugar: `parseStreams()` en `scripts/telemetry.js`.
