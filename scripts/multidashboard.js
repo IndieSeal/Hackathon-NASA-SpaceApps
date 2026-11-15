@@ -23,7 +23,7 @@ function spark(cv, a, status) {
 }
 
 function build(id) {
-  const el = document.createElement("article"), p = T.profile(id);
+  const el = document.createElement("button"), p = T.profile(id);
   el.className = "mcard";
   el.innerHTML = `<div class="who"><img class="avatar" alt=""><div><b></b><span></span></div></div>
     <div class="main">

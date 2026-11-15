@@ -20,6 +20,7 @@ button{cursor:pointer}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:16px}
 .empty{grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);background:#fff;border:1px dashed var(--line);border-radius:14px}
 .mcard{display:grid;grid-template-columns:132px 1fr;gap:18px;padding:18px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.mcard:hover{background:#000000;}
 .who{display:flex;flex-direction:column;gap:10px;min-width:0}
 .avatar{width:100%;aspect-ratio:1;object-fit:cover;object-position:50% 10%;border-radius:12px;background:var(--soft)}
 .who b{display:block;font-weight:600;line-height:1.25;overflow-wrap:anywhere}
