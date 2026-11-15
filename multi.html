@@ -1,37 +1,37 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Astronautas en vivo</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="multi.css">
-</head>
-<body>
-<div class="wrap">
-  <header>
-    <div>
-      <h1>Astronautas en vivo</h1>
-      <span class="muted"><i class="dot" id="mConn"></i><span id="mConnTxt">Conectando</span></span>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Astronautas en vivo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="multi.css">
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div>
+          <h1>Astronautas en vivo</h1>
+          <span class="muted"><i class="dot" id="mConn"></i><span id="mConnTxt">Conectando</span></span>
+        </div>
+        <div class="bar">
+          <input id="mId" value="AST-01" aria-label="ID del astronauta">
+          <select id="mSc" aria-label="Escenario">
+            <option value="nominal">Nominal</option>
+            <option value="ansiedad">Ansiedad</option>
+            <option value="cardiovascular">Cardiovascular</option>
+            <option value="infeccion">Infección</option>
+          </select>
+          <button class="ghost" id="mStart">Iniciar stream</button>
+          <button class="ghost" id="mShot">Disparo único</button>
+          <button class="ghost" id="mStop">Detener</button>
+        </div>
+      </header>
+      <section class="grid" id="multi"><div class="empty" id="mEmpty">Sin astronautas todavía. Elige un escenario para iniciar la telemetría.</div></section>
     </div>
-    <div class="bar">
-      <input id="mId" value="AST-01" aria-label="ID del astronauta">
-      <select id="mSc" aria-label="Escenario">
-        <option value="nominal">Nominal</option>
-        <option value="ansiedad">Ansiedad</option>
-        <option value="cardiovascular">Cardiovascular</option>
-        <option value="infeccion">Infección</option>
-      </select>
-      <button class="ghost" id="mStart">Iniciar stream</button>
-      <button class="ghost" id="mShot">Disparo único</button>
-      <button class="ghost" id="mStop">Detener</button>
-    </div>
-  </header>
-  <section class="grid" id="multi"><div class="empty" id="mEmpty">Sin astronautas todavía. Elige un escenario para iniciar la telemetría.</div></section>
-</div>
-<script src="./scripts/telemetry.js"></script>
-<script src="./scripts/multidashboard.js"></script>
-</body>
+    <script src="./scripts/telemetry.js"></script>
+    <script src="./scripts/multidashboard.js"></script>
+  </body>
 </html>
