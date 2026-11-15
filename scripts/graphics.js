@@ -165,8 +165,12 @@ async function history(initial){
     const r = await fetch(API + "/history"); if (!r.ok) throw 0;
     const list = await r.json(); pollOk = true;
     if (initial){
-      list.slice(-MAX).forEach(d => { const t = d.raw_telemetry;
-        series.t.push(clock(t.timestamp)); series.hr.push(t.hr); series.spo2.push(t.spo2); series.hrv.push(t.hrv_rmssd); series.sbp.push(t.sbp); });
+      list.slice(-MAX).forEach(d => {
+        const t = d.raw_telemetry;
+        const namec = d.nombrec;
+        astronautName.innerHTML = namec;
+        series.t.push(clock(t.timestamp)); series.hr.push(t.hr); series.spo2.push(t.spo2); series.hrv.push(t.hrv_rmssd); series.sbp.push(t.sbp); 
+    });
       if (list.length){ render(list[list.length - 1], false); lastColor = list[list.length - 1].nasa_alert_color; c1.update("none"); c2.update("none"); }
     } else if (list.length && list[list.length - 1].raw_telemetry.timestamp !== lastTs){
       onTelemetry(list[list.length - 1]);
@@ -213,7 +217,10 @@ $("persist").addEventListener("click", async () => {
   catch(e){ $("persistInfo").textContent = "Sin respuesta del servidor"; }
 });
 
-history(true); health(); socket(); persistStatus();
+history(true);
+health();
+socket();
+persistStatus();
 setInterval(persistStatus, 5000);
 setInterval(() => { if (!wsOn) history(false); }, 2000);
 setInterval(health, 10000);
