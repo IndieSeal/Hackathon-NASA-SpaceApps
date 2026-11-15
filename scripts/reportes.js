@@ -38,11 +38,7 @@ $("modalClose").addEventListener("click", closePreview);
 modalOverlay.addEventListener("click", e => { if (e.target === modalOverlay) closePreview(); });
 
 function renderRow(r) {
-  console.log(r.astronaut_id.trim());
-  console.log(window.location.search.substring(1));
-
   if(window.location.search.length > 2 && r.astronaut_id.trim().localeCompare(window.location.search.substring(1)) != 0) return;
-  console.log("Wait, they dont love you like i love you, WAIT, tararara");
 
   const tr = document.createElement("tr");
 
