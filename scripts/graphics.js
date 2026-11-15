@@ -68,6 +68,7 @@ function render(d, pushPoint){
 
   last = d; $("gen").disabled = false;
   const c = d.nasa_alert_color, tel = d.raw_telemetry, m = d.derived_metrics || {}, trg = d.clinical_triggers || [];
+  astronautName.textContent = tel.nombrec || d.astronaut_id;
 
   $("hero").className = "card hero " + c;
   $("level").textContent = LEVEL[c] || c;
@@ -166,12 +167,8 @@ async function history(initial){
         const list = await r.json();
         pollOk = true;
         if (initial){
-            // For each user
             list.slice(-MAX).forEach(d => {
                 const t = d.raw_telemetry;
-                const namec = d.nombrec;
-                astronautName.innerHTML = namec;
-                
                 series.t.push(clock(t.timestamp));
                 series.hr.push(t.hr);
                 series.spo2.push(t.spo2);
@@ -208,16 +205,6 @@ function socket(){
   ws.onclose = () => { wsOn = false; conn(); setTimeout(socket, delay); delay = Math.min(delay * 1.5, 10000); };
   ws.onerror = () => ws.close();
 }
-
-/* Escenario elegido y disparo unico (POST /simulate/{escenario}) */
-let current = null;
-document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => { current = b.dataset.s; $("shot").disabled = false; }));
-$("shot").addEventListener("click", async () => {
-  if (!current) return;
-  $("shot").disabled = true;
-  try { await post("/simulate/" + current); } catch(e){ console.error(e); }
-  $("shot").disabled = false;
-});
 
 /* Persistencia en Postgres (GET /persistence/status, POST /persistence/start|stop) */
 let persistOn = false;

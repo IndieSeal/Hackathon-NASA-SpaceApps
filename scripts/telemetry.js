@@ -14,14 +14,17 @@
  */
 (function () {
 "use strict";
-const API = (new URLSearchParams(location.search).get("api") || "").replace(/\/$/, "");
+const sameOriginAsApi = location.port === "8000" || location.port === "";
+const defaultApi = sameOriginAsApi ? "" : `${location.protocol}//${location.hostname}:8000`;
+const API = (new URLSearchParams(location.search).get("api") || defaultApi).replace(/\/$/, "");
 const WS_URL = API ? API.replace(/^http/, "ws") + "/ws/telemetry"
                    : (location.protocol === "https:" ? "wss:" : "ws:") + "//" + location.host + "/ws/telemetry";
 const KEEP = 60;
 
-/* La API solo entrega astronaut_id: nombres y fotos se registran aqui (o con Telemetry.setProfile). */
+/* La API ya entrega nombrec (nombre completo desde Postgres) dentro de raw_telemetry.
+   PROFILES solo cubre lo que la API no manda (foto) o un astronauta sin telemetria todavia. */
 const PROFILES = {
-  "AST-01": {name: "Mimic William David Henry Afton", photo: "imgs/astronaut.png"}
+  "AST-01": {photo: "imgs/astronaut.png"}
 };
 
 const CRIT = /^(ARRITMIA_EXTREMA|TAQUICARDIA_SEVERA|HIPOXIA_CRITICA|INDICE_DE_CHOQUE_CRITICO|HIPOTENSION_SEVERA|CRISIS_HIPERTENSIVA|FIEBRE_ALTA|HIPOTERMIA|TAQUIPNEA_SEVERA|BRADIPNEA_CRITICA|DESATURACION_RAPIDA_DE_OXIGENO)$/;
@@ -87,7 +90,10 @@ window.Telemetry = {
   metrics: M.map(({key, label, unit}) => ({key, label, unit})),
   ready: pull(),
   astronauts: () => [...store.keys()],
-  profile: id => ({id, name: id, photo: "imgs/astronaut.png", ...(PROFILES[id] || {})}),
+  profile: id => {
+    const nombrec = store.get(id)?.latest?.raw_telemetry?.nombrec;
+    return {id, name: id, photo: "imgs/astronaut.png", ...(PROFILES[id] || {}), ...(nombrec ? {name: nombrec} : {})};
+  },
   setProfile: (id, p) => { PROFILES[id] = {...(PROFILES[id] || {}), ...p}; },
   latest: id => store.get(id)?.latest ?? null,
   alert: id => store.get(id)?.latest?.nasa_alert_color ?? null,
