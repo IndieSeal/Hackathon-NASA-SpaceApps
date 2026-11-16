@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Group Dashboard - LynxLab: Health Monitor</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="multi.css">
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div>
+          <h1>Astronautas en vivo</h1>
+          <span class="muted"><i class="dot" id="mConn"></i><span id="mConnTxt">Conectando</span></span>
+        </div>
+        <a class="ghost" href="./reportes.html">Reportes PDF</a>
+      </header>
+      <section class="ctrl-grid" id="ctrlGrid"></section>
+      <section class="grid" id="multi"><div class="empty" id="mEmpty">Sin astronautas todavía. Elige un escenario para iniciar la telemetría.</div></section>
+    </div>
+    <script src="./scripts/telemetry.js"></script>
+    <script src="./scripts/multidashboard.js"></script>
+  </body>
+</html>

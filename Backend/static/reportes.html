@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reportes SBAR - Aerospace Health Monitoring</title>
+<style>
+  :root {
+    --bg: #0b0f19;
+    --card-bg: #111827;
+    --border: #1e293b;
+    --text-primary: #e2e8f0;
+    --text-muted: #94a3b8;
+    --verde: #10b981;
+    --amarillo: #f59e0b;
+    --rojo: #ef4444;
+    --accent: #38bdf8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    padding: 16px;
+  }
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+  .topbar h1 { font-size: 18px; letter-spacing: 0.08em; margin: 0; }
+  .topbar .subtitle { font-size: 11px; color: var(--text-muted); letter-spacing: 0.05em; }
+  .topbar a.back-link {
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+  }
+  .topbar a.back-link:hover { border-color: var(--accent); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  thead th {
+    text-align: left;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody td {
+    padding: 10px 14px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: rgba(56, 189, 248, 0.05); }
+
+  .badge {
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    border: 1px solid var(--border);
+  }
+  .badge.VERDE { color: var(--verde); border-color: var(--verde); background: rgba(16,185,129,0.1); }
+  .badge.AMARILLO { color: var(--amarillo); border-color: var(--amarillo); background: rgba(245,158,11,0.1); }
+  .badge.ROJO { color: var(--rojo); border-color: var(--rojo); background: rgba(239,68,68,0.1); }
+
+  .actions { display: flex; gap: 8px; }
+  .actions button, .actions a {
+    background: #1e293b;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .actions button:hover, .actions a:hover { border-color: var(--accent); }
+
+  .empty-state {
+    padding: 30px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    width: min(900px, 92vw);
+    height: min(85vh, 1100px);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .modal-head button {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  .modal-body { flex: 1; }
+  .modal-body iframe { width: 100%; height: 100%; border: none; background: #fff; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div>
+    <h1>REPORTES SBAR</h1>
+    <div class="subtitle">LISTA DE REPORTES CLINICOS GENERADOS - DESCARGA Y VISTA PREVIA</div>
+  </div>
+  <a class="back-link" href="/">&larr; VOLVER AL DASHBOARD</a>
+</header>
+
+<div id="content">
+  <div class="empty-state" id="emptyState">Cargando reportes...</div>
+  <table id="reportsTable" style="display:none;">
+    <thead>
+      <tr>
+        <th>FECHA</th>
+        <th>ASTRONAUTA</th>
+        <th>ALERTA</th>
+        <th>DIAGNOSTICO</th>
+        <th>INFERENCIA</th>
+        <th>ACCIONES</th>
+      </tr>
+    </thead>
+    <tbody id="reportsBody"></tbody>
+  </table>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span id="modalTitle">Vista previa</span>
+      <button id="modalClose" type="button">Cerrar</button>
+    </div>
+    <div class="modal-body">
+      <iframe id="modalFrame" src="about:blank"></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const tableEl = document.getElementById("reportsTable");
+  const bodyEl = document.getElementById("reportsBody");
+  const emptyEl = document.getElementById("emptyState");
+  const modalOverlay = document.getElementById("modalOverlay");
+  const modalFrame = document.getElementById("modalFrame");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalClose = document.getElementById("modalClose");
+
+  function openPreview(pdfUrl, label) {
+    modalTitle.textContent = label;
+    modalFrame.src = pdfUrl;
+    modalOverlay.classList.add("open");
+  }
+
+  function closePreview() {
+    modalOverlay.classList.remove("open");
+    modalFrame.src = "about:blank";
+  }
+
+  modalClose.addEventListener("click", closePreview);
+  modalOverlay.addEventListener("click", (event) => {
+    if (event.target === modalOverlay) closePreview();
+  });
+
+  function renderRow(sbarReport) {
+    const tr = document.createElement("tr");
+
+    const dateTd = document.createElement("td");
+    dateTd.textContent = new Date(sbarReport.generated_at * 1000).toLocaleString("es-ES", { hour12: false });
+    tr.appendChild(dateTd);
+
+    const astroTd = document.createElement("td");
+    astroTd.textContent = sbarReport.astronaut_id;
+    tr.appendChild(astroTd);
+
+    const alertTd = document.createElement("td");
+    const badge = document.createElement("span");
+    badge.className = "badge " + sbarReport.alert_color;
+    badge.textContent = sbarReport.alert_color;
+    alertTd.appendChild(badge);
+    tr.appendChild(alertTd);
+
+    const diagTd = document.createElement("td");
+    diagTd.textContent = sbarReport.diagnosis;
+    tr.appendChild(diagTd);
+
+    const infTd = document.createElement("td");
+    infTd.textContent = sbarReport.inference_time_sec.toFixed(2) + " s";
+    tr.appendChild(infTd);
+
+    const actionsTd = document.createElement("td");
+    const actions = document.createElement("div");
+    actions.className = "actions";
+
+    if (sbarReport.pdf_filename) {
+      const pdfUrl = "/reportes_pdf/" + encodeURIComponent(sbarReport.pdf_filename);
+
+      const previewBtn = document.createElement("button");
+      previewBtn.type = "button";
+      previewBtn.textContent = "Vista previa";
+      previewBtn.addEventListener("click", () =>
+        openPreview(pdfUrl, sbarReport.astronaut_id + " - " + sbarReport.pdf_filename)
+      );
+      actions.appendChild(previewBtn);
+
+      const downloadLink = document.createElement("a");
+      downloadLink.href = pdfUrl;
+      downloadLink.download = sbarReport.pdf_filename;
+      downloadLink.textContent = "Descargar";
+      actions.appendChild(downloadLink);
+    } else {
+      const pending = document.createElement("span");
+      pending.textContent = "PDF no disponible";
+      actions.appendChild(pending);
+    }
+
+    actionsTd.appendChild(actions);
+    tr.appendChild(actionsTd);
+
+    return tr;
+  }
+
+  async function loadReports() {
+    try {
+      const response = await fetch("/reports");
+      if (!response.ok) throw new Error(String(response.status));
+      const reports = await response.json();
+      const sorted = reports.slice().sort((a, b) => b.generated_at - a.generated_at);
+
+      if (sorted.length === 0) {
+        emptyEl.textContent = "Sin reportes generados todavia.";
+        emptyEl.style.display = "block";
+        tableEl.style.display = "none";
+        return;
+      }
+
+      bodyEl.innerHTML = "";
+      for (const sbarReport of sorted) {
+        bodyEl.appendChild(renderRow(sbarReport));
+      }
+      emptyEl.style.display = "none";
+      tableEl.style.display = "table";
+    } catch (err) {
+      emptyEl.textContent = "No se pudieron cargar los reportes.";
+      emptyEl.style.display = "block";
+      tableEl.style.display = "none";
+    }
+  }
+
+  loadReports();
+  setInterval(loadReports, 15000);
+})();
+</script>
+</body>
+</html>

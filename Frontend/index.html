@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Individual Dashboard - LynxLab: Health Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  </head>
+  <body>
+      <div class="app">
+          <aside class="body-panel">
+              <svg id="body" viewBox="230 30 500 930" role="img" aria-label="Astronauta con sus sistemas corporales. Acerca el cursor para explorarlos.">
+                  <defs>
+                  <radialGradient id="gA"><stop offset=".8" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
+                  <radialGradient id="gM"><stop offset=".8" stop-color="#000"/><stop offset="1" stop-color="#fff"/></radialGradient>
+                  <mask id="mA" maskUnits="userSpaceOnUse" x="0" y="0" width="980" height="980"><circle id="lensA" cx="-500" cy="-500" r="95" fill="url(#gA)"/></mask>
+                  <mask id="mM" maskUnits="userSpaceOnUse" x="0" y="0" width="980" height="980"><rect width="980" height="980" fill="#fff"/><circle id="lensM" cx="-500" cy="-500" r="95" fill="url(#gM)"/></mask>
+                  <g id="art" fill="none" stroke-width="5" stroke-linecap="round">
+                  <path d="M512 372C512 330 500 300 490 280M490 280L470 232M490 280L510 232"/>
+                  <path d="M540 300C600 300 640 320 652 360L668 540M460 300C380 300 340 320 328 360L312 540"/>
+                  <path d="M505 440C500 500 495 540 490 580L440 760L420 920M490 580L545 760L565 920"/>
+                  </g>
+                  </defs>
+                  <g mask="url(#mA)">
+                  <rect x="230" y="30" width="500" height="930" fill="#e9eff8"/>
+                  <g fill="#fff">
+                  <ellipse cx="490" cy="140" rx="80" ry="90"/>
+                  <path d="M360 270Q490 235 620 270L610 520Q490 560 370 520Z"/>
+                  <path d="M360 275L305 300Q285 420 300 560L350 560Q345 440 372 340ZM620 275L675 300Q695 420 680 560L630 560Q635 440 608 340Z"/>
+                  <path d="M375 510L488 515L478 930L372 930ZM492 515L605 510L610 930L502 930Z"/>
+                  </g>
+                  <g id="o-core" class="organ core"><path class="s" d="M440 520q-10 40 20 60q40 30 80 0q30-20 20-60q-30-14-60-10q-30-4-60 10z" fill="#d5f0ec" stroke="#2a9d8f" stroke-width="2.5"/><path d="M455 540q20 14 35 0t35 0M460 565q20 14 30 0t30 0" fill="none" stroke="#2a9d8f" stroke-width="2"/></g>
+                  <g id="o-vessels" class="organ vessels"><use class="s" href="#art" stroke="#d9534f"/><use href="#art" stroke="#4f86e0" opacity=".65" transform="translate(12 4)"/></g>
+                  <g id="o-lungs" class="organ lungs"><path class="s" d="M470 300C440 290 400 320 392 380C386 425 400 445 430 442C455 440 470 420 472 390ZM510 300C540 290 580 320 588 380C594 425 580 445 550 442C525 440 510 420 508 390Z" fill="#dbe8fb" stroke="#4f86e0" stroke-width="2.5"/><path d="M490 262v50M490 312l-20 18M490 312l20 18" fill="none" stroke="#4f86e0" stroke-width="3"/></g>
+                  <g id="o-heart" class="organ heart"><path class="s" d="M512 438C480 414 468 396 478 378C488 362 508 366 512 382C516 366 538 362 548 378C558 396 544 414 512 438Z" fill="#f6b7bc" stroke="#d93a3a" stroke-width="2.5"/></g>
+                  <g id="o-brain" class="organ brain"><path class="s" d="M440 150c-18-30 0-70 38-72c6-8 24-8 30 0c38 2 56 42 38 72c-10 18-30 24-52 22c-24 2-44-4-54-22z" fill="#e4daf8" stroke="#8a6fd0" stroke-width="2.5"/><path d="M490 82v82M455 105q18 8 35 0M525 105q-18 8-35 0M458 135q18 8 32 0M522 135q-18 8-32 0" fill="none" stroke="#8a6fd0" stroke-width="2"/></g>
+                  </g>
+                  <image href="imgs/astronaut.png" x="0" y="0" width="980" height="980" mask="url(#mM)"/>
+              </svg>
+              
+              <p class="hint">Acerca el cursor al cuerpo para explorar sus sistemas</p>
+          </aside>
+          
+          <main class="main">
+            <div class="wrap">
+                <header>
+                    <div>
+                        <div style="width: 100%; display: flex; justify-content: space-between;">
+                            <select class="ghost astro-select" id="astroSelect" aria-label="Elegir astronauta"></select>
+                            <button class="ghost astro-select" id="astroDashboard">Regresar ↩</button>
+                        </div>
+
+                        <h1 id="astronaut-name" style="font-size:3lh;">Cargando perfil...</h1>
+                        <div id="astronaut-name_subline" style="display: flex; height: 5px; background-color: black;"></div>
+                        <p>Telemetría biomédica en tiempo real</p>
+                    </div>
+                    <div class="status" aria-live="polite">
+                        <span><i class="dot" id="dConn"></i><span id="tConn">Conectando</span></span>
+                        <span><i class="dot" id="dMl"></i>Motor ML</span>
+                        <span><i class="dot" id="dOl"></i>Ollama</span>
+                        <button id="reportesHTML" class="ghost">Reportes PDF</button>
+                    </div>
+                </header>
+
+                <div class="controls">
+                    <span class="muted">Simulador disponible en el panel multi-astronauta</span>
+                    <button class="ghost" id="persist" aria-pressed="false">Guardado en BD: apagado</button>
+                    <button class="ghost" id="oledBtn" aria-pressed="false">Conectar OLED</button>
+                    <span class="muted" id="persistInfo" aria-live="polite"></span>
+                </div>
+
+                <section class="card hero NONE" id="hero">
+                    <div>
+                        <div class="level"><i></i><span id="level">Sin datos</span></div>
+                        <div class="pred" id="pred">Elige un escenario para iniciar la telemetría</div>
+                        <div class="chips" id="chips"><span class="chip none">Sin hallazgos activos</span></div>
+                    </div>
+                    <div class="conf">
+                        <b id="conf">--</b>
+                        <small>confianza del modelo</small>
+                        <div class="anom muted" id="anom">Astronauta: --</div>
+                    </div>
+                </section>
+
+                <section class="card vitals">
+                    <div class="v" id="k-hr"><span class="l">Frecuencia cardíaca</span><b id="v-hr">--</b><em>lpm</em></div>
+                    <div class="v" id="k-hrv"><span class="l">Variabilidad (RMSSD)</span><b id="v-hrv">--</b><em>ms</em></div>
+                    <div class="v" id="k-spo2"><span class="l">Saturación SpO2</span><b id="v-spo2">--</b><em>%</em></div>
+                    <div class="v" id="k-bp"><span class="l">Presión arterial</span><b id="v-bp">--/--</b><em>mmHg</em></div>
+                    <div class="v" id="k-temp"><span class="l">Temperatura</span><b id="v-temp">--</b><em>°C</em></div>
+                    <div class="v" id="k-resp"><span class="l">Frecuencia respiratoria</span><b id="v-resp">--</b><em>rpm</em></div>
+                    <div class="v" id="k-shock"><span class="l">Índice de choque</span><b id="v-shock">--</b></div>
+                    <div class="v" id="k-pulse"><span class="l">Presión de pulso</span><b id="v-pulse">--</b><em>mmHg</em></div>
+                </section>
+
+                <div class="row two">
+                    <section class="card panel"><h2>Corazón y oxigenación</h2><div class="chart"><canvas id="c1"></canvas></div></section>
+                    <section class="card panel"><h2>Variabilidad y presión sistólica</h2><div class="chart"><canvas id="c2"></canvas></div></section>
+                </div>
+
+                <div class="row bottom">
+                    <section class="card panel"><h2>Probabilidad por condición</h2><div class="chart"><canvas id="c3"></canvas></div></section>
+                    <section class="card panel">
+                    <div class="ph">
+                        <h2>Reporte clínico SBAR</h2>
+                        <button class="ghost" id="gen" disabled>Generar reporte</button>
+                    </div>
+                    <div class="pending" id="pend"><span class="spin"></span>Redactando el reporte con Llama 3.2</div>
+                    <div class="report" id="rep">Aún no hay reportes. Se genera uno automáticamente cuando la alerta pasa a amarillo o rojo.</div>
+                    <div class="meta" id="repMeta"></div>
+                    </section>
+                </div>
+            </div>
+          </main>
+    </div>
+    <div class="tip" id="tip" role="status"></div>
+      
+    <script src="./scripts/graphics.js"></script>
+    <script src="./scripts/body.js"></script>
+    <script src="./scripts/telemetry.js"></script>
+    <script type="module" src="./scripts/oled.js"></script>
+  </body>
+</html>

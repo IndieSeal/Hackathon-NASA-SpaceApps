@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reportes SBAR - LynxLab: Health Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="reportes.css">
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div>
+          <h1>Reportes SBAR</h1>
+          <p class="muted">Lista de reportes clinicos generados - vista previa y descarga en PDF</p>
+        </div>
+        <button class="ghost" id="regresarReportes">Volver al dashboard ↩</a>
+      </header>
+
+      <div class="empty" id="empty">Cargando reportes...</div>
+
+      <table id="table" style="display:none;">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Astronauta</th>
+            <th>Alerta</th>
+            <th>Diagnostico</th>
+            <th>Inferencia</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-box">
+        <div class="modal-head">
+          <span id="modalTitle">Vista previa</span>
+          <button class="ghost" id="modalClose" type="button">Cerrar</button>
+        </div>
+        <iframe id="modalFrame" src="about:blank"></iframe>
+      </div>
+    </div>
+
+    <script src="./scripts/reportes.js"></script>
+  </body>
+</html>
