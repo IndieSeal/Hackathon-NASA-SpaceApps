@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aerospace Health Monitoring - Consola de Mision</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0b0f19;
+    --card-bg: #111827;
+    --border: #1e293b;
+    --text-primary: #e2e8f0;
+    --text-muted: #94a3b8;
+    --verde: #10b981;
+    --amarillo: #f59e0b;
+    --rojo: #ef4444;
+    --accent: #38bdf8;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    padding: 16px;
+  }
+
+  .mono {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+
+  h1, h2, h3 {
+    font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    margin: 0;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+
+  .topbar h1 {
+    font-size: 18px;
+    letter-spacing: 0.08em;
+    color: var(--text-primary);
+  }
+
+  .topbar .subtitle {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  .ws-badge {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border: 1px solid var(--border);
+  }
+
+  .ws-badge.online {
+    color: var(--verde);
+    border-color: var(--verde);
+    background: rgba(16, 185, 129, 0.1);
+  }
+
+  .ws-badge.reconnecting {
+    color: var(--amarillo);
+    border-color: var(--amarillo);
+    background: rgba(245, 158, 11, 0.1);
+  }
+
+  .control-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+
+  .control-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    margin-right: 4px;
+  }
+
+  button.scenario-btn {
+    background: #1e293b;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  button.scenario-btn:hover {
+    border-color: var(--accent);
+  }
+
+  button.scenario-btn.active {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  button.stop-btn {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--rojo);
+    border: 1px solid var(--rojo);
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    margin-left: auto;
+  }
+
+  button.stop-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+  }
+
+  .persistence-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  button.persist-btn {
+    background: #1e293b;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  button.persist-btn:hover {
+    border-color: var(--accent);
+  }
+
+  button.persist-btn.on {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: var(--verde);
+    color: var(--verde);
+  }
+
+  .persist-info {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+    white-space: nowrap;
+  }
+
+  .triage-banner {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 24px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-left: 6px solid var(--text-muted);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    transition: border-left-color 0.3s ease;
+  }
+
+  .triage-banner.VERDE { border-left-color: var(--verde); }
+  .triage-banner.AMARILLO { border-left-color: var(--amarillo); }
+  .triage-banner.ROJO { border-left-color: var(--rojo); }
+
+  .alert-color-value {
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+  }
+
+  .alert-color-value.VERDE { color: var(--verde); }
+  .alert-color-value.AMARILLO { color: var(--amarillo); }
+  .alert-color-value.ROJO { color: var(--rojo); }
+
+  .banner-detail .primary-prediction {
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .banner-detail .scenario-tag {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  .confidence-box {
+    text-align: right;
+  }
+
+  .confidence-box .value {
+    font-size: 26px;
+    font-weight: 700;
+    font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+  }
+
+  .confidence-box .label {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+  }
+
+  .anomaly-box {
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .anomaly-box.detected {
+    color: var(--rojo);
+    border-color: var(--rojo);
+    background: rgba(239, 68, 68, 0.08);
+  }
+
+  .anomaly-box.clear {
+    color: var(--text-muted);
+  }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .kpi-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+
+  .kpi-card.warn {
+    border-color: var(--amarillo);
+    background: rgba(245, 158, 11, 0.08);
+  }
+
+  .kpi-card.crit {
+    border-color: var(--rojo);
+    background: rgba(239, 68, 68, 0.1);
+  }
+
+  .kpi-card .kpi-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+
+  .kpi-card .kpi-value {
+    font-size: 24px;
+    font-weight: 700;
+    font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+  }
+
+  .kpi-card .kpi-unit {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-left: 4px;
+  }
+
+  .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .chart-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+  }
+
+  .chart-card h3 {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .chart-box {
+    position: relative;
+    height: 220px;
+  }
+
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 12px;
+  }
+
+  .panel {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .panel h3 {
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+  }
+
+  .triggers-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .triggers-list li {
+    font-size: 12px;
+    font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+    padding: 5px 10px;
+    border-radius: 6px;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid var(--rojo);
+    color: var(--rojo);
+  }
+
+  .triggers-list.empty li {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: var(--verde);
+    color: var(--verde);
+  }
+
+  .sbar-status {
+    font-size: 12px;
+    color: var(--accent);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .spinner {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid rgba(56, 189, 248, 0.25);
+    border-top-color: var(--accent);
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .sbar-text {
+    white-space: pre-wrap;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-primary);
+    font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  .sbar-meta {
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+  }
+
+  @media (max-width: 1100px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .charts-grid { grid-template-columns: 1fr; }
+    .bottom-grid { grid-template-columns: 1fr; }
+    .triage-banner { grid-template-columns: 1fr; text-align: left; gap: 8px; }
+    .confidence-box { text-align: left; }
+  }
+
+  .navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    position: relative;
+  }
+
+  .navbar-brand {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+  }
+
+  .navbar-menu {
+    position: relative;
+  }
+
+  .navbar-toggle {
+    background: #1e293b;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+  }
+
+  .navbar-toggle:hover {
+    border-color: var(--accent);
+  }
+
+  .navbar-toggle .caret {
+    font-size: 10px;
+    margin-left: 4px;
+  }
+
+  .navbar-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 170px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 6px;
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 10;
+  }
+
+  .navbar-dropdown.open {
+    display: flex;
+  }
+
+  .navbar-item {
+    background: transparent;
+    color: var(--text-primary);
+    border: none;
+    border-radius: 6px;
+    padding: 9px 10px;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .navbar-item:hover {
+    background: #1e293b;
+  }
+
+  .navbar-item.active {
+    color: var(--accent);
+    background: rgba(56, 189, 248, 0.12);
+  }
+
+  .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+
+  .avatar-sprite {
+    flex: none;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: #1e293b;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .profile-id h2 {
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
+
+  .profile-tag {
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+
+  .profile-astro-id {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+    letter-spacing: 0.06em;
+  }
+
+  .profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 12px;
+  }
+
+  .profile-facts {
+    margin: 0;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px 14px;
+  }
+
+  .profile-facts dt {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+  }
+
+  .profile-facts dd {
+    margin: 0;
+    font-size: 14px;
+    font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+  }
+
+  .reports-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 420px;
+    overflow-y: auto;
+  }
+
+  .reports-empty {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .report-item {
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--text-muted);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+
+  .report-item.VERDE { border-left-color: var(--verde); }
+  .report-item.AMARILLO { border-left-color: var(--amarillo); }
+  .report-item.ROJO { border-left-color: var(--rojo); }
+
+  .report-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+
+  .report-badge {
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .report-badge.VERDE { color: var(--verde); }
+  .report-badge.AMARILLO { color: var(--amarillo); }
+  .report-badge.ROJO { color: var(--rojo); }
+
+  .report-text {
+    white-space: pre-wrap;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-primary);
+    font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+  }
+
+  @media (max-width: 1100px) {
+    .profile-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-brand">AEROSPACE HEALTH MONITORING</div>
+  <div class="navbar-menu">
+    <button class="navbar-toggle" id="navToggle" type="button" aria-expanded="false" aria-haspopup="true">
+      MENU <span class="caret">&#9662;</span>
+    </button>
+    <div class="navbar-dropdown" id="navDropdown">
+      <button class="navbar-item active" type="button" data-view="dashboard">Dashboard</button>
+      <button class="navbar-item" type="button" data-view="perfil">Perfiles</button>
+      <a class="navbar-item" href="/reportes.html">Reportes PDF</a>
+    </div>
+  </div>
+</nav>
+
+<div id="viewDashboard">
+
+<header class="topbar">
+  <div>
+    <h1>AEROSPACE HEALTH MONITORING</h1>
+    <div class="subtitle">CONSOLA DE CONTROL DE MISION - TELEMETRIA BIOMEDICA EN TIEMPO REAL</div>
+  </div>
+  <div id="wsBadge" class="ws-badge reconnecting">RECONECTANDO</div>
+</header>
+
+<section class="control-bar">
+  <span class="control-label">ESCENARIO:</span>
+  <button class="scenario-btn" data-scenario="nominal">Nominal</button>
+  <button class="scenario-btn" data-scenario="ansiedad">Ataque de Ansiedad</button>
+  <button class="scenario-btn" data-scenario="cardiovascular">Emergencia Cardiovascular</button>
+  <button class="scenario-btn" data-scenario="infeccion">Infeccion Sistemica</button>
+  <button class="stop-btn" id="stopBtn">Detener Flujo</button>
+  <div class="persistence-control">
+    <button class="persist-btn" id="persistBtn">Guardado en BD: INACTIVO</button>
+    <span class="persist-info" id="persistInfo">Lecturas guardadas: 0</span>
+  </div>
+</section>
+
+<section class="triage-banner VERDE" id="triageBanner">
+  <div class="alert-color-value VERDE" id="alertColorValue">SIN DATOS</div>
+  <div class="banner-detail">
+    <div class="primary-prediction" id="primaryPrediction">Esperando telemetria...</div>
+    <div class="scenario-tag" id="astronautTag">ASTRONAUTA: --</div>
+  </div>
+  <div class="confidence-box">
+    <div class="value mono" id="confidenceValue">--.--%</div>
+    <div class="label">CONFIANZA DEL MODELO</div>
+  </div>
+  <div class="anomaly-box clear" id="anomalyBox">ISOLATION FOREST: SIN DATOS</div>
+</section>
+
+<section class="kpi-grid" id="kpiGrid">
+  <div class="kpi-card" id="kpi-hr">
+    <div class="kpi-label">FRECUENCIA CARDIACA</div>
+    <div class="kpi-value mono"><span id="val-hr">--</span><span class="kpi-unit">bpm</span></div>
+  </div>
+  <div class="kpi-card" id="kpi-hrv">
+    <div class="kpi-label">VARIABILIDAD HRV (RMSSD)</div>
+    <div class="kpi-value mono"><span id="val-hrv">--</span><span class="kpi-unit">ms</span></div>
+  </div>
+  <div class="kpi-card" id="kpi-spo2">
+    <div class="kpi-label">SATURACION SPO2</div>
+    <div class="kpi-value mono"><span id="val-spo2">--</span><span class="kpi-unit">%</span></div>
+  </div>
+  <div class="kpi-card" id="kpi-bp">
+    <div class="kpi-label">PRESION ARTERIAL</div>
+    <div class="kpi-value mono"><span id="val-bp">--/--</span><span class="kpi-unit">mmHg</span></div>
+  </div>
+  <div class="kpi-card" id="kpi-temp">
+    <div class="kpi-label">TEMPERATURA</div>
+    <div class="kpi-value mono"><span id="val-temp">--</span><span class="kpi-unit">C</span></div>
+  </div>
+  <div class="kpi-card" id="kpi-resp">
+    <div class="kpi-label">FRECUENCIA RESPIRATORIA</div>
+    <div class="kpi-value mono"><span id="val-resp">--</span><span class="kpi-unit">rpm</span></div>
+  </div>
+  <div class="kpi-card" id="kpi-shock">
+    <div class="kpi-label">INDICE DE CHOQUE (HR/SBP)</div>
+    <div class="kpi-value mono"><span id="val-shock">--</span></div>
+  </div>
+  <div class="kpi-card" id="kpi-pulse">
+    <div class="kpi-label">PRESION DE PULSO</div>
+    <div class="kpi-value mono"><span id="val-pulse">--</span><span class="kpi-unit">mmHg</span></div>
+  </div>
+</section>
+
+<section class="charts-grid">
+  <div class="chart-card">
+    <h3>CARDIOVASCULAR Y OXIGENACION</h3>
+    <div class="chart-box"><canvas id="chartCardio"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <h3>ESTRES AUTONOMICO Y HEMODINAMICA</h3>
+    <div class="chart-box"><canvas id="chartAutonomic"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <h3>DISTRIBUCION DE PROBABILIDADES DEL MODELO ML</h3>
+    <div class="chart-box"><canvas id="chartProbabilities"></canvas></div>
+  </div>
+</section>
+
+<section class="bottom-grid">
+  <div class="panel">
+    <h3>HALLAZGOS CLINICOS</h3>
+    <ul class="triggers-list empty" id="triggersList">
+      <li>SIN DISPARADORES ACTIVOS</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <h3>REPORTE MEDICO SBAR - LLAMA 3.2</h3>
+    <div class="sbar-status" id="sbarStatus" style="display:none;">
+      <span class="spinner"></span>
+      <span>Generando analisis clinico con Llama 3.2...</span>
+    </div>
+    <div class="sbar-text" id="sbarText">Sin reportes generados todavia. Un reporte se generara automaticamente cuando el nivel de alerta pase a AMARILLO o ROJO.</div>
+    <div class="sbar-meta" id="sbarMeta"></div>
+  </div>
+</section>
+
+</div>
+
+<div id="viewPerfil" style="display:none;">
+
+<section class="panel profile-header">
+  <div class="avatar-sprite">
+    <svg width="56" height="56" viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="30" fill="#0b0f19" stroke="#38bdf8" stroke-width="2"/>
+      <ellipse cx="32" cy="30" rx="16" ry="18" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+      <ellipse cx="32" cy="28" rx="10" ry="11" fill="#38bdf8" opacity="0.25"/>
+      <path d="M18 41 Q32 49 46 41" stroke="#38bdf8" stroke-width="1.5" fill="none"/>
+    </svg>
+  </div>
+  <div class="profile-id">
+    <h2 id="profileName">Cargando perfil...</h2>
+    <div class="profile-tag" id="profileTag">-- &middot; --</div>
+    <div class="profile-astro-id" id="profileAstroId">ID: --</div>
+  </div>
+</section>
+
+<section class="profile-grid">
+  <div class="panel">
+    <h3>DATOS PERSONALES</h3>
+    <dl class="profile-facts" id="profilePersonal"></dl>
+  </div>
+  <div class="panel">
+    <h3>HISTORIAL DE REPORTES</h3>
+    <div class="reports-list" id="reportsList">
+      <div class="reports-empty">Sin reportes generados todavia.</div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const MAX_WINDOW = 25;
+
+  const TRIGGER_SEVERITY = {
+    ARRITMIA_EXTREMA: "crit",
+    TAQUICARDIA_SEVERA: "crit",
+    TAQUICARDIA: "warn",
+    BRADICARDIA: "warn",
+    TAQUICARDIA_DE_INICIO_RAPIDO: "warn",
+    HIPOXIA_CRITICA: "crit",
+    HIPOXIA: "warn",
+    DESATURACION_RAPIDA_DE_OXIGENO: "crit",
+    INDICE_DE_CHOQUE_CRITICO: "crit",
+    INDICE_DE_CHOQUE_ELEVADO: "warn",
+    HIPOTENSION_SEVERA: "crit",
+    HIPOTENSION: "warn",
+    CRISIS_HIPERTENSIVA: "crit",
+    HIPERTENSION: "warn",
+    PRESION_DE_PULSO_ESTRECHA: "warn",
+    PRESION_DE_PULSO_AMPLIA: "warn",
+    FIEBRE_ALTA: "crit",
+    FIEBRE: "warn",
+    HIPOTERMIA: "crit",
+    TAQUIPNEA_SEVERA: "crit",
+    TAQUIPNEA: "warn",
+    BRADIPNEA_CRITICA: "crit",
+    BRADIPNEA: "warn",
+    DEFICIT_DE_SUENO_SEVERO: "warn",
+    DEFICIT_DE_SUENO: "warn",
+    VARIABILIDAD_CARDIACA_SUPRIMIDA: "warn",
+  };
+
+  const METRIC_TRIGGERS = {
+    hr: ["ARRITMIA_EXTREMA", "TAQUICARDIA_SEVERA", "TAQUICARDIA", "BRADICARDIA", "TAQUICARDIA_DE_INICIO_RAPIDO"],
+    hrv: ["VARIABILIDAD_CARDIACA_SUPRIMIDA"],
+    spo2: ["HIPOXIA_CRITICA", "HIPOXIA", "DESATURACION_RAPIDA_DE_OXIGENO"],
+    bp: ["HIPOTENSION_SEVERA", "HIPOTENSION", "CRISIS_HIPERTENSIVA", "HIPERTENSION"],
+    temp: ["FIEBRE_ALTA", "FIEBRE", "HIPOTERMIA"],
+    resp: ["TAQUIPNEA_SEVERA", "TAQUIPNEA", "BRADIPNEA_CRITICA", "BRADIPNEA"],
+    shock: ["INDICE_DE_CHOQUE_CRITICO", "INDICE_DE_CHOQUE_ELEVADO"],
+    pulse: ["PRESION_DE_PULSO_ESTRECHA", "PRESION_DE_PULSO_AMPLIA"],
+  };
+
+  const PROBABILITY_LABELS = [
+    "NOMINAL",
+    "ATAQUE_ANSIEDAD",
+    "EVENTO_CARDIOVASCULAR",
+    "INFECCION_ENFERMEDAD",
+    "FATIGA_CIRCADIANA",
+  ];
+
+  const ALERT_COLOR_HEX = { VERDE: "#10b981", AMARILLO: "#f59e0b", ROJO: "#ef4444" };
+
+  const els = {
+    wsBadge: document.getElementById("wsBadge"),
+    triageBanner: document.getElementById("triageBanner"),
+    alertColorValue: document.getElementById("alertColorValue"),
+    primaryPrediction: document.getElementById("primaryPrediction"),
+    astronautTag: document.getElementById("astronautTag"),
+    confidenceValue: document.getElementById("confidenceValue"),
+    anomalyBox: document.getElementById("anomalyBox"),
+    triggersList: document.getElementById("triggersList"),
+    sbarStatus: document.getElementById("sbarStatus"),
+    sbarText: document.getElementById("sbarText"),
+    sbarMeta: document.getElementById("sbarMeta"),
+    stopBtn: document.getElementById("stopBtn"),
+    persistBtn: document.getElementById("persistBtn"),
+    persistInfo: document.getElementById("persistInfo"),
+  };
+
+  const scenarioButtons = Array.from(document.querySelectorAll(".scenario-btn"));
+
+  const charts = {
+    labels: [],
+    hr: [],
+    spo2: [],
+    hrv: [],
+    sbp: [],
+  };
+
+  let lastClientAlertColor = null;
+
+  function clampWindow() {
+    while (charts.labels.length > MAX_WINDOW) {
+      charts.labels.shift();
+      charts.hr.shift();
+      charts.spo2.shift();
+      charts.hrv.shift();
+      charts.sbp.shift();
+    }
+  }
+
+  function timeLabel(timestamp) {
+    const date = new Date(timestamp * 1000);
+    return date.toLocaleTimeString("es-ES", { hour12: false });
+  }
+
+  const cardioChart = new Chart(document.getElementById("chartCardio").getContext("2d"), {
+    type: "line",
+    data: {
+      labels: charts.labels,
+      datasets: [
+        {
+          label: "Frecuencia Cardiaca (bpm)",
+          data: charts.hr,
+          borderColor: "#ef4444",
+          backgroundColor: "rgba(239, 68, 68, 0.1)",
+          yAxisID: "yHr",
+          tension: 0.3,
+          pointRadius: 0,
+        },
+        {
+          label: "SpO2 (%)",
+          data: charts.spo2,
+          borderColor: "#38bdf8",
+          backgroundColor: "rgba(56, 189, 248, 0.1)",
+          yAxisID: "ySpo2",
+          tension: 0.3,
+          pointRadius: 0,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      interaction: { mode: "index", intersect: false },
+      scales: {
+        x: { ticks: { color: "#94a3b8", maxRotation: 0 }, grid: { color: "#1e293b" } },
+        yHr: { position: "left", ticks: { color: "#ef4444" }, grid: { color: "#1e293b" } },
+        ySpo2: { position: "right", ticks: { color: "#38bdf8" }, grid: { display: false } },
+      },
+      plugins: { legend: { labels: { color: "#e2e8f0", boxWidth: 12 } } },
+    },
+  });
+
+  const autonomicChart = new Chart(document.getElementById("chartAutonomic").getContext("2d"), {
+    type: "line",
+    data: {
+      labels: charts.labels,
+      datasets: [
+        {
+          label: "HRV RMSSD (ms)",
+          data: charts.hrv,
+          borderColor: "#10b981",
+          backgroundColor: "rgba(16, 185, 129, 0.1)",
+          yAxisID: "yHrv",
+          tension: 0.3,
+          pointRadius: 0,
+        },
+        {
+          label: "Presion Sistolica (mmHg)",
+          data: charts.sbp,
+          borderColor: "#f59e0b",
+          backgroundColor: "rgba(245, 158, 11, 0.1)",
+          yAxisID: "ySbp",
+          tension: 0.3,
+          pointRadius: 0,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      interaction: { mode: "index", intersect: false },
+      scales: {
+        x: { ticks: { color: "#94a3b8", maxRotation: 0 }, grid: { color: "#1e293b" } },
+        yHrv: { position: "left", ticks: { color: "#10b981" }, grid: { color: "#1e293b" } },
+        ySbp: { position: "right", ticks: { color: "#f59e0b" }, grid: { display: false } },
+      },
+      plugins: { legend: { labels: { color: "#e2e8f0", boxWidth: 12 } } },
+    },
+  });
+
+  const probabilitiesChart = new Chart(document.getElementById("chartProbabilities").getContext("2d"), {
+    type: "bar",
+    data: {
+      labels: PROBABILITY_LABELS,
+      datasets: [
+        {
+          label: "Probabilidad (%)",
+          data: PROBABILITY_LABELS.map(() => 0),
+          backgroundColor: "#38bdf8",
+        },
+      ],
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      scales: {
+        x: { min: 0, max: 100, ticks: { color: "#94a3b8" }, grid: { color: "#1e293b" } },
+        y: { ticks: { color: "#e2e8f0" }, grid: { display: false } },
+      },
+      plugins: { legend: { display: false } },
+    },
+  });
+
+  function severityForCard(cardKey, triggers) {
+    let severity = "ok";
+    const relevant = METRIC_TRIGGERS[cardKey] || [];
+    for (const trigger of triggers) {
+      if (relevant.includes(trigger)) {
+        const level = TRIGGER_SEVERITY[trigger] || "warn";
+        if (level === "crit") return "crit";
+        if (level === "warn") severity = "warn";
+      }
+    }
+    return severity;
+  }
+
+  function applyCardSeverity(cardId, severity) {
+    const card = document.getElementById(cardId);
+    card.classList.remove("warn", "crit");
+    if (severity === "warn" || severity === "crit") {
+      card.classList.add(severity);
+    }
+  }
+
+  function updateBanner(diagnostic) {
+    const color = diagnostic.nasa_alert_color;
+    els.triageBanner.className = "triage-banner " + color;
+    els.alertColorValue.className = "alert-color-value " + color;
+    els.alertColorValue.textContent = color;
+    els.primaryPrediction.textContent = diagnostic.primary_prediction;
+    els.astronautTag.textContent = "ASTRONAUTA: " + diagnostic.astronaut_id;
+    els.confidenceValue.textContent = diagnostic.confidence_pct.toFixed(2) + "%";
+
+    if (diagnostic.unsupervised_anomaly) {
+      els.anomalyBox.className = "anomaly-box detected";
+      els.anomalyBox.textContent = "ISOLATION FOREST: ANOMALIA DETECTADA";
+    } else {
+      els.anomalyBox.className = "anomaly-box clear";
+      els.anomalyBox.textContent = "ISOLATION FOREST: SIN ANOMALIA";
+    }
+  }
+
+  function updateKpis(diagnostic) {
+    const telemetry = diagnostic.raw_telemetry;
+    const metrics = diagnostic.derived_metrics;
+    const triggers = diagnostic.clinical_triggers || [];
+
+    document.getElementById("val-hr").textContent = telemetry.hr.toFixed(0);
+    document.getElementById("val-hrv").textContent = telemetry.hrv_rmssd.toFixed(1);
+    document.getElementById("val-spo2").textContent = telemetry.spo2.toFixed(1);
+    document.getElementById("val-bp").textContent = telemetry.sbp.toFixed(0) + "/" + telemetry.dbp.toFixed(0);
+    document.getElementById("val-temp").textContent = telemetry.temp_c.toFixed(1);
+    document.getElementById("val-resp").textContent = telemetry.resp_rate.toFixed(0);
+    document.getElementById("val-shock").textContent = metrics.shock_index.toFixed(2);
+    document.getElementById("val-pulse").textContent = metrics.pulse_pressure.toFixed(0);
+
+    for (const cardKey of Object.keys(METRIC_TRIGGERS)) {
+      applyCardSeverity("kpi-" + cardKey, severityForCard(cardKey, triggers));
+    }
+  }
+
+  function updateTriggers(diagnostic) {
+    const triggers = diagnostic.clinical_triggers || [];
+    els.triggersList.innerHTML = "";
+    if (triggers.length === 0) {
+      els.triggersList.classList.add("empty");
+      const li = document.createElement("li");
+      li.textContent = "SIN DISPARADORES ACTIVOS";
+      els.triggersList.appendChild(li);
+      return;
+    }
+    els.triggersList.classList.remove("empty");
+    for (const trigger of triggers) {
+      const li = document.createElement("li");
+      li.textContent = trigger;
+      els.triggersList.appendChild(li);
+    }
+  }
+
+  function updateCharts(diagnostic) {
+    const telemetry = diagnostic.raw_telemetry;
+    charts.labels.push(timeLabel(telemetry.timestamp));
+    charts.hr.push(telemetry.hr);
+    charts.spo2.push(telemetry.spo2);
+    charts.hrv.push(telemetry.hrv_rmssd);
+    charts.sbp.push(telemetry.sbp);
+    clampWindow();
+
+    cardioChart.update("none");
+    autonomicChart.update("none");
+
+    const probabilityData = PROBABILITY_LABELS.map((label) => {
+      const value = diagnostic.probabilities[label];
+      return value === undefined ? 0 : Math.round(value * 1000) / 10;
+    });
+    probabilitiesChart.data.datasets[0].data = probabilityData;
+    probabilitiesChart.data.datasets[0].backgroundColor = PROBABILITY_LABELS.map((label) =>
+      label === diagnostic.primary_prediction ? ALERT_COLOR_HEX[diagnostic.nasa_alert_color] || "#38bdf8" : "#334155"
+    );
+    probabilitiesChart.update("none");
+  }
+
+  function showSbarPending() {
+    els.sbarStatus.style.display = "flex";
+  }
+
+  function hideSbarPending() {
+    els.sbarStatus.style.display = "none";
+  }
+
+  function handleTelemetry(diagnostic) {
+    updateBanner(diagnostic);
+    updateKpis(diagnostic);
+    updateTriggers(diagnostic);
+    updateCharts(diagnostic);
+
+    const color = diagnostic.nasa_alert_color;
+    if ((color === "AMARILLO" || color === "ROJO") && color !== lastClientAlertColor) {
+      showSbarPending();
+    }
+    lastClientAlertColor = color;
+  }
+
+  function handleSbarReport(reportData) {
+    hideSbarPending();
+    els.sbarText.textContent = reportData.report_text;
+    els.sbarMeta.textContent =
+      "Alerta: " + reportData.alert_color +
+      " | Diagnostico: " + reportData.diagnosis +
+      " | Tiempo de inferencia: " + reportData.inference_time_sec.toFixed(2) + " s";
+  }
+
+  function setActiveScenarioButton(scenario) {
+    scenarioButtons.forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.scenario === scenario);
+    });
+  }
+
+  async function startScenario(scenario) {
+    setActiveScenarioButton(scenario);
+    try {
+      await fetch("/stream/start/" + scenario, { method: "POST" });
+    } catch (err) {
+      console.error("No se pudo iniciar el escenario", err);
+    }
+  }
+
+  async function stopStream() {
+    setActiveScenarioButton(null);
+    try {
+      await fetch("/stream/stop", { method: "POST" });
+    } catch (err) {
+      console.error("No se pudo detener el flujo", err);
+    }
+  }
+
+  scenarioButtons.forEach((btn) => {
+    btn.addEventListener("click", () => startScenario(btn.dataset.scenario));
+  });
+  els.stopBtn.addEventListener("click", stopStream);
+
+  let persistencePollTimer = null;
+
+  function renderPersistenceStatus(status) {
+    els.persistBtn.classList.toggle("on", status.enabled);
+    els.persistBtn.textContent = "Guardado en BD: " + (status.enabled ? "ACTIVO" : "INACTIVO");
+    let infoText = "Lecturas guardadas: " + status.saved_count;
+    if (status.last_error) {
+      infoText += " | Error: " + status.last_error;
+      els.persistInfo.style.color = "#ef4444";
+    } else {
+      els.persistInfo.style.color = "";
+    }
+    els.persistInfo.textContent = infoText;
+  }
+
+  function managePersistencePolling(enabled) {
+    if (persistencePollTimer) {
+      clearInterval(persistencePollTimer);
+      persistencePollTimer = null;
+    }
+    if (enabled) {
+      persistencePollTimer = setInterval(async () => {
+        try {
+          const response = await fetch("/persistence/status");
+          const status = await response.json();
+          renderPersistenceStatus(status);
+        } catch (err) {
+          // error transitorio de red, se reintenta en el proximo tick
+        }
+      }, 3000);
+    }
+  }
+
+  async function togglePersistence() {
+    const currentlyOn = els.persistBtn.classList.contains("on");
+    const endpoint = currentlyOn ? "/persistence/stop" : "/persistence/start";
+    try {
+      const response = await fetch(endpoint, { method: "POST" });
+      const status = await response.json();
+      renderPersistenceStatus(status);
+      managePersistencePolling(status.enabled);
+    } catch (err) {
+      console.error("No se pudo cambiar el estado de persistencia", err);
+    }
+  }
+
+  async function loadPersistenceStatus() {
+    try {
+      const response = await fetch("/persistence/status");
+      const status = await response.json();
+      renderPersistenceStatus(status);
+      managePersistencePolling(status.enabled);
+    } catch (err) {
+      console.error("No se pudo obtener el estado de persistencia", err);
+    }
+  }
+
+  els.persistBtn.addEventListener("click", togglePersistence);
+
+  function setWsBadge(online) {
+    if (online) {
+      els.wsBadge.className = "ws-badge online";
+      els.wsBadge.textContent = "ONLINE";
+    } else {
+      els.wsBadge.className = "ws-badge reconnecting";
+      els.wsBadge.textContent = "RECONECTANDO";
+    }
+  }
+
+  let reconnectDelay = 1000;
+
+  function connectWebSocket() {
+    const protocol = location.protocol === "https:" ? "wss:" : "ws:";
+    const ws = new WebSocket(protocol + "//" + location.host + "/ws/telemetry");
+
+    ws.onopen = () => {
+      setWsBadge(true);
+      reconnectDelay = 1000;
+    };
+
+    ws.onmessage = (event) => {
+      let message;
+      try {
+        message = JSON.parse(event.data);
+      } catch (err) {
+        return;
+      }
+      if (message.type === "telemetry") {
+        handleTelemetry(message.data);
+      } else if (message.type === "sbar_report") {
+        handleSbarReport(message.data);
+      }
+    };
+
+    ws.onclose = () => {
+      setWsBadge(false);
+      setTimeout(connectWebSocket, reconnectDelay);
+      reconnectDelay = Math.min(reconnectDelay * 1.5, 10000);
+    };
+
+    ws.onerror = () => {
+      ws.close();
+    };
+  }
+
+  async function loadHistory() {
+    try {
+      const response = await fetch("/history");
+      if (!response.ok) return;
+      const readings = await response.json();
+      const windowed = readings.slice(-MAX_WINDOW);
+      for (const diagnostic of windowed) {
+        const telemetry = diagnostic.raw_telemetry;
+        charts.labels.push(timeLabel(telemetry.timestamp));
+        charts.hr.push(telemetry.hr);
+        charts.spo2.push(telemetry.spo2);
+        charts.hrv.push(telemetry.hrv_rmssd);
+        charts.sbp.push(telemetry.sbp);
+      }
+      clampWindow();
+      cardioChart.update("none");
+      autonomicChart.update("none");
+
+      if (readings.length > 0) {
+        const latest = readings[readings.length - 1];
+        updateBanner(latest);
+        updateKpis(latest);
+        updateTriggers(latest);
+        lastClientAlertColor = latest.nasa_alert_color;
+        const probabilityData = PROBABILITY_LABELS.map((label) => {
+          const value = latest.probabilities[label];
+          return value === undefined ? 0 : Math.round(value * 1000) / 10;
+        });
+        probabilitiesChart.data.datasets[0].data = probabilityData;
+        probabilitiesChart.update("none");
+      }
+    } catch (err) {
+      console.error("No se pudo cargar el historial", err);
+    }
+  }
+
+  loadHistory();
+  loadPersistenceStatus();
+  connectWebSocket();
+
+  /* Navegacion: navbar expandible Dashboard / Perfiles */
+  const PROFILE_ASTRONAUT_ID = "AST-01";
+  const navToggle = document.getElementById("navToggle");
+  const navDropdown = document.getElementById("navDropdown");
+  const navItems = Array.from(document.querySelectorAll(".navbar-item"));
+  const viewDashboard = document.getElementById("viewDashboard");
+  const viewPerfil = document.getElementById("viewPerfil");
+
+  const profileEls = {
+    name: document.getElementById("profileName"),
+    tag: document.getElementById("profileTag"),
+    astroId: document.getElementById("profileAstroId"),
+    personal: document.getElementById("profilePersonal"),
+    reports: document.getElementById("reportsList"),
+  };
+
+  function closeNavDropdown() {
+    navDropdown.classList.remove("open");
+    navToggle.setAttribute("aria-expanded", "false");
+  }
+
+  navToggle.addEventListener("click", () => {
+    const isOpen = navDropdown.classList.toggle("open");
+    navToggle.setAttribute("aria-expanded", String(isOpen));
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest(".navbar-menu")) closeNavDropdown();
+  });
+
+  function showView(view) {
+    navItems.forEach((item) => item.classList.toggle("active", item.dataset.view === view));
+    viewDashboard.style.display = view === "dashboard" ? "" : "none";
+    viewPerfil.style.display = view === "perfil" ? "" : "none";
+    if (view === "perfil") loadProfile();
+  }
+
+  navItems.forEach((item) => {
+    item.addEventListener("click", () => {
+      showView(item.dataset.view);
+      closeNavDropdown();
+    });
+  });
+
+  const PERSONAL_FIELD_LABELS = {
+    nacimiento: "FECHA DE NACIMIENTO",
+    tipo_sangre: "TIPO DE SANGRE",
+    nacionalidad: "NACIONALIDAD",
+  };
+
+  function renderPersonalInfo(personales) {
+    profileEls.personal.innerHTML = "";
+    for (const key of Object.keys(PERSONAL_FIELD_LABELS)) {
+      const dt = document.createElement("dt");
+      dt.textContent = PERSONAL_FIELD_LABELS[key];
+      const dd = document.createElement("dd");
+      dd.textContent = (personales && personales[key]) || "--";
+      profileEls.personal.appendChild(dt);
+      profileEls.personal.appendChild(dd);
+    }
+  }
+
+  function renderReports(reports) {
+    profileEls.reports.innerHTML = "";
+    if (!reports.length) {
+      const empty = document.createElement("div");
+      empty.className = "reports-empty";
+      empty.textContent = "Sin reportes generados todavia.";
+      profileEls.reports.appendChild(empty);
+      return;
+    }
+    const sorted = reports.slice().sort((a, b) => b.generated_at - a.generated_at);
+    for (const sbarReport of sorted) {
+      const item = document.createElement("div");
+      item.className = "report-item " + sbarReport.alert_color;
+
+      const head = document.createElement("div");
+      head.className = "report-head";
+      const badge = document.createElement("span");
+      badge.className = "report-badge " + sbarReport.alert_color;
+      badge.textContent = sbarReport.alert_color;
+      const date = document.createElement("span");
+      date.textContent = new Date(sbarReport.generated_at * 1000).toLocaleString("es-ES", { hour12: false });
+      head.appendChild(badge);
+      head.appendChild(date);
+
+      const diag = document.createElement("div");
+      diag.className = "sbar-meta";
+      diag.textContent =
+        "Diagnostico: " + sbarReport.diagnosis +
+        " | Tiempo de inferencia: " + sbarReport.inference_time_sec.toFixed(2) + " s";
+
+      const text = document.createElement("div");
+      text.className = "report-text";
+      text.textContent = sbarReport.report_text;
+
+      item.appendChild(head);
+      item.appendChild(diag);
+      item.appendChild(text);
+      profileEls.reports.appendChild(item);
+    }
+  }
+
+  async function loadProfile() {
+    try {
+      const response = await fetch("/astronauts/" + PROFILE_ASTRONAUT_ID);
+      if (!response.ok) throw new Error(String(response.status));
+      const profile = await response.json();
+      profileEls.name.textContent = profile.nombrec;
+      profileEls.tag.textContent = profile.rango + " · " + profile.puesto;
+      profileEls.astroId.textContent = "ID: " + profile.astronaut_id;
+      renderPersonalInfo(profile.personales);
+    } catch (err) {
+      profileEls.name.textContent = "No se pudo cargar el perfil";
+    }
+
+    try {
+      const response = await fetch("/reports?astronaut_id=" + PROFILE_ASTRONAUT_ID);
+      if (!response.ok) throw new Error(String(response.status));
+      renderReports(await response.json());
+    } catch (err) {
+      renderReports([]);
+    }
+  }
+})();
+</script>
+</body>
+</html>
