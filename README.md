@@ -78,7 +78,7 @@ Esto inicia PostgreSQL y Adminer. Después, activa **Guardado en BD** desde el d
 
 ## Consumo de recursos
 
-En las pruebas locales, el servidor completo consume aproximadamente **900 MB de RAM en reposo sin el modelo de Ollama cargado** y hasta **2 GB con `llama3.2` cargado**. Ollama se ejecuta en CPU y, mientras está inactivo, el uso de CPU puede permanecer en **0%**. Durante simulaciones y carga extrema se observó un máximo aproximado de **10 GB de RAM** y **51% de CPU**.
+En las pruebas locales, el servidor completo consume aproximadamente **900 MB de RAM en reposo sin el modelo de Ollama cargado** y hasta **2 GB con `llama3.2` cargado**. Ollama se ejecuta en CPU y, mientras está inactivo, el uso de CPU puede permanecer en **0%**. Durante simulaciones y carga extrema se observó un máximo aproximado de **10 GB de RAM** y **51% de CPU** al estar conectadas 4 personas mediante ssh pero sin conexiones y 4 simulaciones llega a 3 - 4 GB de ram en produccion de simulacion.
 
 Son cifras de referencia observadas en el equipo de prueba; pueden variar según el hardware, el sistema operativo, el modelo cargado y la cantidad de simulaciones simultáneas.
 
