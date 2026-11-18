@@ -1,6 +1,117 @@
-# Project LynxLab
+# Project LynxLab - ENGLISH
 
 **NASA Space Apps Challenge | Create Health Monitoring Software for Astronauts on Space Missions**
+
+<p align="center">
+	<a href="imagenesx/1.png"><img src="imagenesx/1.png" alt="Multi-astronaut panel with telemetry and alerts" width="80%"></a><br>
+	<a href="imagenesx/2.png"><img src="imagenesx/2.png" alt="Individual astronaut biomedical dashboard" width="80%"></a><br>
+	<a href="imagenesx/3.png"><img src="imagenesx/3.png" alt="Individual dashboard with risk alert and SBAR report" width="80%"></a>
+</p>
+
+LynxLab is a local biomedical monitoring prototype for space missions. It receives or simulates vital signs, evaluates possible anomalies, and presents the status of each astronaut on dashboards for the crew and mission control. When findings are detected, it can generate a clinical report in SBAR format.
+
+**Demonstrations:** [View presentation](https://canva.link/l6er9uk3bv85cpy) · **Web demo:** [Static web demo](https://amdevs.mx/nasa-space-app-challenge/lynxlab) · **Repository:** [IndieSeal/Hackathon-NASA-SpaceApps](https://github.com/IndieSeal/Hackathon-NASA-SpaceApps)
+
+## What It Includes
+
+- A live panel for multiple astronauts and an individual dashboard with vital-sign graphs.
+- A simulator with nominal and risk scenarios for demonstrating alerts without physical sensors.
+- A Python engine that calculates derived metrics, detects anomalies, and classifies risk as `GREEN`, `YELLOW`, or `RED`.
+- SBAR reports written in Spanish by `llama3.2` through a local Ollama instance; if Ollama is unavailable, a deterministic fallback report is used.
+- Optional persistence of readings in PostgreSQL.
+
+The language model only writes the report from the diagnosis calculated by the engine; it does not determine the classification or invent biomedical values.
+
+## Stack
+
+| Area | Technology |
+|---|---|
+| API and real time | Python 3.11+, FastAPI, REST, and WebSockets |
+| Biomedical analysis | NumPy, scikit-learn, and deterministic Python rules |
+| LLM-assisted reports | Local Ollama, `llama3.2` (optional) |
+| Dashboard | HTML, CSS, JavaScript, and Chart.js |
+| Persistence | PostgreSQL 16 and asyncpg (optional) |
+
+## Start the Prototype
+
+The basic walkthrough requires Python 3.11+ and a browser. Ollama and Docker are not required to test the dashboard with simulated telemetry.
+
+1. In a terminal, install dependencies and start the API:
+
+	```bash
+	cd Backend
+	python3 -m venv .venv
+	source .venv/bin/activate
+	pip install -r requirements.txt
+	uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+	```
+
+	On Windows PowerShell, activate the environment with `.venv\Scripts\Activate.ps1` instead of `source .venv/bin/activate`.
+
+2. In another terminal, serve the frontend:
+
+	```bash
+	cd Frontend
+	python3 -m http.server 5500
+	```
+
+3. Open the [multi-astronaut dashboard](http://localhost:5500/multi.html?api=http://localhost:8000). Select a scenario and press **Start** to view simulated telemetry. The [individual dashboard](http://localhost:5500/index.html?api=http://localhost:8000) and [interactive API documentation](http://localhost:8000/docs) are also available.
+
+## Optional Services
+
+**Ollama reports:** Install Ollama, start the service, and download the configured model:
+
+```bash
+ollama serve
+ollama pull llama3.2
+```
+
+When available, the API uses it to write SBAR reports. Without Ollama, the demo continues to work with the fallback generator.
+
+**Save telemetry in PostgreSQL:** With Docker Compose installed, run the following from `Backend/`:
+
+```bash
+docker compose up -d
+```
+
+This starts PostgreSQL and Adminer. Then enable **Database Saving** from the dashboard. Adminer is available at [http://localhost:8080](http://localhost:8080).
+
+## Resource Consumption
+
+In local tests, the complete server consumes approximately **900 MB of RAM at rest without the Ollama model loaded** and up to **2 GB with `llama3.2` loaded**. Ollama runs on the CPU, and when idle, CPU usage can remain at **0%**. During simulations and extreme load, a maximum of approximately **10 GB of RAM** and **51% CPU** was observed with four people connected via SSH but no active connections; with four simulations, usage reached approximately 3–4 GB of RAM during simulation production.
+
+These are reference figures observed on the test equipment; they may vary according to the hardware, operating system, loaded model, and number of simultaneous simulations.
+
+<p align="center">
+	<strong>Server at rest</strong><br>
+	<a href="imagenesx/reposo.png"><img src="imagenesx/reposo.png" alt="Server CPU and memory usage at rest" width="80%"></a><br>
+	<strong>Server during simulations and high load</strong><br>
+	<a href="imagenesx/enuso.png"><img src="imagenesx/enuso.png" alt="Server CPU and memory usage during high load" width="80%"></a>
+</p>
+
+## NASA References
+
+- [Risk of Cardiovascular Adaptations](https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/)
+- [Risk of Hypoxia](https://www.nasa.gov/reference/risk-of-hypoxia/)
+
+This project is a hackathon prototype with simulated telemetry; it is not a medical device and does not replace evaluation by health professionals—for now.
+
+## Team
+
+| Member | Country | Contribution |
+|---|---|---|
+| Alejandro Sacbe Martinez Ibarra | Mexico | Frontend development |
+| Andre Mateo Vasquez Mosqueda | Mexico | Backend development |
+| Ethan Miguel Mahlstedt Aviles | Mexico | Arduino demo and display configuration |
+| Jubet Amdeleli Novelo Ibarra | Mexico | Arduino demo and display configuration |
+| José Pablo Luque Ayala | Mexico | Arduino demo and display configuration |
+| Dania Paez Garate | Mexico | Presentation design and general support |
+
+---
+
+# Proyecto LynxLab - ESPAÑOL
+
+**NASA Space Apps Challenge | Crear software de monitoreo de salud para astronautas en misiones espaciales**
 
 <p align="center">
 	<a href="imagenesx/1.png"><img src="imagenesx/1.png" alt="Panel multi-astronauta con telemetría y alertas" width="80%"></a><br>
@@ -91,10 +202,10 @@ Son cifras de referencia observadas en el equipo de prueba; pueden variar según
 
 ## Referencias NASA
 
-- [Risk of Cardiovascular Adaptations](https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/)
-- [Risk of Hypoxia](https://www.nasa.gov/reference/risk-of-hypoxia/)
+- [Riesgo de adaptaciones cardiovasculares](https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/)
+- [Riesgo de hipoxia](https://www.nasa.gov/reference/risk-of-hypoxia/)
 
-Este proyecto es un prototipo de hackathon con telemetría simulada; no es un dispositivo médico ni sustituye la evaluación de profesionales de salud, por ahora.....
+Este proyecto es un prototipo de hackathon con telemetría simulada; no es un dispositivo médico ni sustituye la evaluación de profesionales de salud, por ahora.
 
 ## Equipo
 
@@ -106,6 +217,3 @@ Este proyecto es un prototipo de hackathon con telemetría simulada; no es un di
 | Jubet Amdeleli Novelo Ibarra | México | Demo con Arduino y configuración del display |
 | José Pablo Luque Ayala | México | Demo con Arduino y configuración del display |
 | Dania Paez Garate | México | Diseño de la presentación y apoyo general |
-
-
-67
